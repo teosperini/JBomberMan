@@ -1,0 +1,14 @@
+/* Impostazioni per la scritta cliccabile come pulsante */
+.toggle-label {
+    -fx-text-fill: #3498db; /* Colore del testo */
+    -fx-font-size: 16px; /* Dimensione del testo */
+    -fx-cursor: hand; /* Cambia il cursore del mouse quando si passa sopra la scritta */
+    -fx-background-color: transparent; /* Sfondo trasparente per rimuovere il colore di sfondo del pulsante */
+    -fx-border-color: transparent; /* Bordo trasparente per rimuovere il bordo del pulsante */
+    -fx-font-family: "SfComicScriptBold-YXD2"; /* Nome del font personalizzato */
+}
+
+/* Impostazioni quando la scritta è cliccata (attiva) */
+.toggle-label.toggled {
+    /* Aggiungi gli stili desiderati quando la scritta è cliccata */
+}
