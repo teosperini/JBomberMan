@@ -18,6 +18,7 @@ public class SceneManager {
     public static final int WIDTH = SCALE_FACTOR* MainController.DX;
     public static final int HEIGHT = SCALE_FACTOR*MainController.DY;
     public static final Font CUSTOM_FONT_SMALL = Font.loadFont(SceneManager.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR-5);
+    public static final int MAX_NAME_LETTERS = 8;
 
 
     /**

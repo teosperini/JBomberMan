@@ -19,7 +19,7 @@ public class BackgroundMusic {
     private static final AudioClip CLICK = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("click.wav").toExternalForm()));
     private static final AudioClip DEATH = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("death.mp3").toExternalForm()));
     private static final AudioClip ENEMY_DEATH = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("enemy_death.mp3").toExternalForm()));
-
+    private static final AudioClip INVINCIBLE = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("Invincible.mp3").toExternalForm()));
 
     private static MediaPlayer gameMediaPlayer;
     private static MediaPlayer menuMediaPlayer;
@@ -94,7 +94,17 @@ public class BackgroundMusic {
         DEATH.play();
     }
 
-     public static void playEnemyDeath(){
+    public static void playInvincible(){
+        INVINCIBLE.play();
+    }
+
+    public static void stopInvincible(){
+        if (INVINCIBLE.isPlaying()){
+            INVINCIBLE.stop();
+        }
+    }
+
+    public static void playEnemyDeath(){
          ENEMY_DEATH.play();
      }
 }

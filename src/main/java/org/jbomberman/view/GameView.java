@@ -84,8 +84,7 @@ public class GameView implements Observer {
         FIRE("power_up/bomb.png"),
         LIFE("power_up/oneup.png"),
         INVINCIBLE("power_up/resistance.png"),
-        COIN("power_up/coin.gif"),
-        DESTRUCTION("random_blocks/blocks.gif"),
+        COIN("power_up/coin.gif")
         ;
 
         private final Image image;
@@ -149,8 +148,7 @@ public class GameView implements Observer {
         });
         pauseExitButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            controller.endMatch();
-            controller.quitMatch();
+            SceneManager.changePane(pause, gameContinue);
         });
 
         // Keyboard events handling
@@ -199,19 +197,19 @@ public class GameView implements Observer {
         options.getChildren().addAll(optionsStopMusicButton, optionsBackButton);
 
         //################# GAME CONTINUE ################//
-
+        // Initializing the gameContinue pane
         gameContinue = SceneManager.createPane("Save your results", true,false);
         gameContinue.setVisible(false);
 
+        // Initializing the textField of the gameContinue, where the user will be able to write his name
         TextField textField = new TextField();
         gameContinue.getChildren().addAll(textField);
 
         setCentred(textField);
 
-        int maxLength = 8;
 
         TextFormatter<String> textFormatter = new TextFormatter<>(change -> {
-                if (change.isAdded() && change.getControlNewText().length() > maxLength) {
+                if (change.isAdded() && change.getControlNewText().length() > MAX_NAME_LETTERS) {
                     return null; // Ignore the change if it exceeds the limit
                 }
                 return change;
@@ -620,9 +618,11 @@ public class GameView implements Observer {
 
     private void doInvinciblePowerUp(boolean boo) {
         if (boo) {
+            BackgroundMusic.playInvincible();
             player.setOpacity(0.5);
             powerUPs(puInvincible);
         }else {
+            BackgroundMusic.stopInvincible();
             player.setOpacity(1);
         }
     }

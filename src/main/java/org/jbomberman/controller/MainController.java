@@ -144,6 +144,9 @@ public class MainController {
 
     // Returns to the main menu, resetting the model
     public void quitMatch() {
+        if (BackgroundMusic.isPlaying()) {
+            BackgroundMusic.stopGameMusic();
+        }
         model.save();
         scene.setRoot(menuView.getMenu());
         BackgroundMusic.playMenuMusic();

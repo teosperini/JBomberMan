@@ -1,8 +1,11 @@
 #mainScrollPane > .viewport {
-    -fx-background-color: transparent;
+    -fx-background-color: black;
 }
 
 #mainScrollPane {
     -fx-background-color: transparent;
-
+    -fx-border-color: lightblue;
+    -fx-border-width: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 0;
 }

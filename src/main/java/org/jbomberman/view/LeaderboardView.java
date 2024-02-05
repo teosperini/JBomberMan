@@ -14,21 +14,22 @@ import java.util.List;
 public class LeaderboardView {
 
     private final MainController controller = MainController.getInstance();
-    private final Pane leaderboardPane = SceneManager.createPane("LEADERBOARD", false, false);
+    private final Pane leaderboardPane = SceneManager.createPane("Leaderboard", false, false);
     private final ScrollPane scrollPane = new ScrollPane();
     private final VBox contentPane = new VBox(2); //lo spazio tra le scritte
 
     public LeaderboardView() {
-        initScrollPane();
+        genScrollPane();
 
         leaderboardPane.getChildren().add(scrollPane);
     }
 
-    private void initScrollPane() {
-        scrollPane.setPrefSize(250, 150);
+    private void genScrollPane() {
+        scrollPane.setPrefSize(400, 200);
         contentPane.setAlignment(Pos.CENTER);
+        scrollPane.setTranslateY(20);
         scrollPane.setStyle("-fx-control-inner-background: transparent;");
-        contentPane.setStyle("-fx-background-color: transparent;");
+        contentPane.setStyle("-fx-background-color: black;");
         scrollPane.setId("mainScrollPane");
         scrollPane.getStylesheets().add("org/jbomberman/view/scrollPane.css");
         scrollPane.setContent(contentPane);
@@ -38,13 +39,20 @@ public class LeaderboardView {
 
     public void updateScrollPane() {
         contentPane.getChildren().clear(); // Rimuove tutti i label attuali
+        contentPane.setAlignment(Pos.CENTER_LEFT);
 
         List<User> leaderboard = controller.loadLeaderboard();
         leaderboard.sort(Comparator.comparingInt(User::score).reversed().thenComparing(User::level).thenComparing(User::name));
 
 
         leaderboard.forEach(user -> {
-            Label player = new Label(user.name() + ": " + user.score() + " - " + user.level());
+            String playerName = user.name();
+
+            int nameLength = playerName.length();
+            int paddingLength = SceneManager.MAX_NAME_LETTERS - nameLength;
+            String username = playerName + " ".repeat(paddingLength);
+
+            Label player = new Label(username + ": " + user.score() + " - " + user.level());
             player.setFont(SceneManager.CUSTOM_FONT_SMALL);
             player.setStyle("-fx-text-fill: white;");
             contentPane.getChildren().add(player);

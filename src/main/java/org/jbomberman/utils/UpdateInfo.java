@@ -8,7 +8,6 @@ public class UpdateInfo {
     private final UpdateType updateType;
     private KeyCode keyCode;
     private boolean b;
-    private String nickname;
     private Coordinate oldc;
     private Coordinate newc;
     private Coordinate c;
@@ -56,14 +55,6 @@ public class UpdateInfo {
         this.index = index;
     }
 
-    public UpdateInfo(UpdateType updateType, Coordinate oldc, Coordinate newc, String name, int index) {
-        this.updateType = updateType;
-        this.oldc = oldc;
-        this.newc = newc;
-        this.nickname = name;
-        this.index = index;
-    }
-
     public UpdateInfo(UpdateType updateType, boolean b) {
         this.updateType = updateType;
         this.b = b;
@@ -85,11 +76,6 @@ public class UpdateInfo {
     public UpdateInfo(ArrayList<Triad> triadArrayList, UpdateType updateType) {
         this.updateType = updateType;
         this.triadArrayList = triadArrayList;
-    }
-
-    public UpdateInfo(UpdateType updateType, String nickname) {
-        this.updateType = updateType;
-        this.nickname = nickname;
     }
 
     public UpdateInfo(UpdateType updateType, Coordinate oldc, Coordinate newc, int index, KeyCode keyCode) {
@@ -145,10 +131,6 @@ public class UpdateInfo {
 
     public ArrayList<Triad> getTriadArrayList() {
         return triadArrayList;
-    }
-
-    public String getNickname(){
-        return nickname;
     }
 
     public KeyCode getKeyCode() {
