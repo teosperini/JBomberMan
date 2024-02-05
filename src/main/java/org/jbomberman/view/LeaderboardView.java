@@ -7,10 +7,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.jbomberman.controller.MainController;
 import org.jbomberman.model.User;
-import org.jbomberman.utils.SceneManager;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class LeaderboardView {
 
@@ -40,7 +39,7 @@ public class LeaderboardView {
     public void updateScrollPane() {
         contentPane.getChildren().clear(); // Rimuove tutti i label attuali
 
-        ArrayList<User> leaderboard = controller.loadLeaderboard();
+        List<User> leaderboard = controller.loadLeaderboard();
         leaderboard.sort(Comparator.comparingInt(User::score).reversed().thenComparing(User::level).thenComparing(User::name));
 
 

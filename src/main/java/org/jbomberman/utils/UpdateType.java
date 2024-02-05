@@ -23,7 +23,6 @@ public enum UpdateType {
     UPDATE_EXPLOSION,
     LEVEL,
     UPDATE_ENEMY_LIFE,
-    LOAD_NAME,
     UPDATE_DOOR,
     LOAD_POINTS,
     LOAD_LIFE,

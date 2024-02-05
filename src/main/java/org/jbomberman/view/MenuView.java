@@ -2,13 +2,11 @@ package org.jbomberman.view;
 
 
 import org.jbomberman.controller.MainController;
-import org.jbomberman.utils.Difficulty;
-import org.jbomberman.utils.SceneManager;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import org.jbomberman.utils.BackgroundMusic;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -17,12 +15,11 @@ public class MenuView implements Observer{
 
     private final AnchorPane menu = new AnchorPane();
     private Pane mainMenu;
-    private Pane options;
     private Pane leaderboard;
     LeaderboardView leader;
-    Pane difficulty;
 
     private MainController controller;
+
     /**
      * Initializes the menu
      */
@@ -40,72 +37,27 @@ public class MenuView implements Observer{
         mainMenu.setVisible(true);
 
         Label mainMenuPlayButton = SceneManager.getButton("play", 0, color);
-        Label mainMenuOptionsButton = SceneManager.getButton("options", 1, color);
-        Label mainMenuLeaderboardButton = SceneManager.getButton("leaderboard", 2, color);
-        Label mainMenuExitButton = SceneManager.getButton("quit", 3, color);
 
-        mainMenuPlayButton.setOnMouseClicked(mouseEvent -> controller.playButtonPressed());
-        mainMenuOptionsButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(mainMenu, options));
+        Label mainMenuLeaderboardButton = SceneManager.getButton("leaderboard", 1, color);
+        Label mainMenuExitButton = SceneManager.getButton("quit", 2, color);
+
+        mainMenuPlayButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            controller.playButtonPressed();
+        });
+
         mainMenuLeaderboardButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
             leader.updateScrollPane();
             leaderboard = leader.getLeaderboardPane();
             SceneManager.changePane(mainMenu, leaderboard);
         });
-        mainMenuExitButton.setOnMouseClicked(mouseEvent -> controller.gameExit());
-
-        mainMenu.getChildren().addAll(mainMenuPlayButton, mainMenuOptionsButton, mainMenuLeaderboardButton, mainMenuExitButton);
-
-        //################# OPTIONS #################//
-        options = SceneManager.createPane("Options", false, false);
-        options.setVisible(false);
-
-        Label optionsDifficultyButton = SceneManager.getButton("difficulty",1, color);
-        Label optionsBackButton = SceneManager.getButton("back", 3, color);
-
-        optionsDifficultyButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(options,difficulty));
-        optionsBackButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(options, mainMenu));
-
-        options.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
-                SceneManager.changePane(options, mainMenu);
-            }
+        mainMenuExitButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            controller.gameExit();
         });
 
-        options.getChildren().addAll(optionsDifficultyButton, optionsBackButton);
-
-        //############# DIFFICULTY ################//
-        difficulty = SceneManager.createPane("Difficulty", false, false);
-
-        difficulty.setVisible(false);
-
-        Label difficultyEasy = SceneManager.getButton("easy", 0, Color.WHITE);
-        Label difficultyNormal = SceneManager.getButton("normal", 1, Color.WHITE);
-        Label difficultyHard = SceneManager.getButton("hard", 2, Color.WHITE);
-        Label difficultyBackButton = SceneManager.getButton("back", 3, Color.WHITE);
-
-        difficultyEasy.setOnMouseClicked(mouseEvent -> {
-            controller.setDifficulty(Difficulty.EASY);
-            SceneManager.changePane(difficulty, options);
-        });
-        difficultyNormal.setOnMouseClicked(mouseEvent -> {
-            controller.setDifficulty(Difficulty.NORMAL);
-            SceneManager.changePane(difficulty, options);
-        });
-        difficultyHard.setOnMouseClicked(mouseEvent -> {
-            controller.setDifficulty(Difficulty.HARD);
-            SceneManager.changePane(difficulty, options);
-        });
-
-        difficultyBackButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(difficulty, options));
-
-        difficulty.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
-                SceneManager.changePane(difficulty,options);
-                keyEvent.consume();
-            }
-        });
-
-        difficulty.getChildren().addAll(difficultyEasy,difficultyNormal,difficultyHard,difficultyBackButton);
+        mainMenu.getChildren().addAll(mainMenuPlayButton, mainMenuLeaderboardButton, mainMenuExitButton);
 
         //############### LEADERBOARD ##############//
 
@@ -113,11 +65,14 @@ public class MenuView implements Observer{
 
         Label leaderboardBackButton = SceneManager.getButton("back", 4, Color.WHITE);
 
-        leaderboardBackButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(leaderboard, mainMenu));
+        leaderboardBackButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            SceneManager.changePane(leaderboard, mainMenu);
+        });
 
         leaderboard.getChildren().add(leaderboardBackButton);
 
-        menu.getChildren().addAll(mainMenu, options, leaderboard, difficulty);
+        menu.getChildren().addAll(mainMenu, leaderboard);
     }
 
 

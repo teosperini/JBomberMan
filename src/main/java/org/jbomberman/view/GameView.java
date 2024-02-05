@@ -16,51 +16,50 @@ import javafx.util.Duration;
 
 import java.util.*;
 
-import static org.jbomberman.utils.SceneManager.*;
+import static org.jbomberman.view.SceneManager.*;
 
 public class GameView implements Observer {
 
-    private final MainController controller;
+    private final MainController controller; // The instance of the controller
 
-    public final AnchorPane gameBoard;
+    private final AnchorPane gameBoard; // The master pane, where the all the game components
+                                        // are placed
+    //END GAME PANES
+    Pane gameContinue; // This Pane is shown when saving the player name (both death and win)
+    Pane gameOver; // The game over pane
+    Pane gameVictory; // The game victory pane
 
-    //END GAME PANELS
-    Pane gameContinue;
-    Pane continueVictory;
-    Pane gameOver;
-    Pane victory;
-
-    //PAUSE PANELS
-    Pane pause;
-    Pane options;
+    //PAUSE PANES
+    Pane pause; // The pause pane
+    Pane options; // The options pane
 
     //IMAGE VIEWS
-    ImageView player;
-    ImageView puBomb;
-    ImageView puLife;
-    ImageView puInvincible;
-    ImageView exit;
+    ImageView player; // The player
+    ImageView puBomb; // The larger explosion power up
+    ImageView puLife; // The 1-up power up
+    ImageView puInvincible; // The 10 seconds invincibility power up
+    ImageView exit; // The exit door
 
-    //ARRAYS
-    private final List<ImageView> randomBlocks;
-    private final List<ImageView> enemies;
-    private final List<ImageView> coins;
+    // List of ImageViews
+    /// Each list has a correspondent List of Coordinates in the model
+    private final List<ImageView> randomBlocks; // The List of the random blocks
+    private final List<ImageView> enemies; // The list of the enemies
+    private final List<ImageView> coins; // The list of the coins
+
+    /// This List is for the ImageViews of the explosion (to easily remove them after the explosion)
     private final List<ImageView> bombExplosion;
 
     //BOTTOM BAR
     private final HBox bottomBar = new HBox();
     Label livesLabel;
     Label pointsLabel;
-    Label timerLabel;
-    Label nameLabel;
 
     //Label to show the score in the gameOver pane
     Label deathPointsLabel;
+    Label victoryPointsLabel;
 
     private int level;
     private String nickname;
-
-    private boolean isOn = false;
 
     //IMAGES
     private enum BlockImage {
@@ -113,28 +112,48 @@ public class GameView implements Observer {
     }
 
     public void initialize() {
+        // The event handler for the pressed keys
         gameBoard.setOnKeyPressed(controller::handleGameKeyEvent);
     }
 
     //####################### PANELS #######################//
+
+    /**
+     * This method initialize:
+     * - The pause Pane
+     * - The options Pane
+     * - The gameContinue Pane
+     * - The gameOver Pane
+     * - The gameVictory Pane
+     * and all of their buttons (except for the buttons of gameVictory, those are chosen at runtime)
+     */
     private void genInGamePanels() {
         //################# PAUSE ################//
+        // Initializing the pause Pane
         pause = SceneManager.createPane("Pause", true, false);
         pause.setVisible(false);
 
+        // Declaring and initializing the pause buttons
         Label pauseResumeButton = SceneManager.getButton("resume", 0, Color.WHITE);
         Label pauseOptionsButton = SceneManager.getButton("options", 1, Color.WHITE);
-        Label pauseRestartButton = SceneManager.getButton("restart", 2, Color.WHITE);
-        Label pauseExitButton = SceneManager.getButton("menu", 3, Color.WHITE);
+        Label pauseExitButton = SceneManager.getButton("menu", 2, Color.WHITE);
 
-        pauseResumeButton.setOnMouseClicked(mouseEvent -> controller.resumeController());
-        pauseOptionsButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(pause,options));
-        pauseRestartButton.setOnMouseClicked(mouseEvent -> restart());
+        // Mouse events handling
+        pauseResumeButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            controller.resumeController();
+        });
+        pauseOptionsButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            SceneManager.changePane(pause,options);
+        });
         pauseExitButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
             controller.endMatch();
             controller.quitMatch();
         });
 
+        // Keyboard events handling
         pause.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
                 controller.resumeController();
@@ -142,21 +161,34 @@ public class GameView implements Observer {
             }
         });
 
-        pause.getChildren().addAll(pauseResumeButton, pauseOptionsButton, pauseRestartButton, pauseExitButton);
+        //Adding the buttons to the pane
+        pause.getChildren().addAll(pauseResumeButton, pauseOptionsButton, pauseExitButton);
 
         //################# OPTIONS ################//
+        // Initializing the options pane
         options = SceneManager.createPane("Options", true, false);
         options.setVisible(false);
 
-        Label optionsStopMusicButton = SceneManager.getButton("stop music", 1, Color.WHITE);
+        // Declaring and initializing the options buttons
+        Label optionsStopMusicButton = SceneManager.getButton("stop/resume music", 1, Color.WHITE);
         Label optionsBackButton = SceneManager.getButton("back", 2, Color.WHITE);
 
+        // Mouse events handling
         optionsStopMusicButton.setOnMouseClicked(mouseEvent -> {
-            controller.stopMusic();
-            SceneManager.changePane(options,pause);
+            BackgroundMusic.playClick();
+            if (BackgroundMusic.isPlaying()) {
+                controller.stopMusic();
+            } else {
+                controller.playMusic();
+            }
+            SceneManager.changePane(options, pause);
         });
-        optionsBackButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(options, pause));
+        optionsBackButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            SceneManager.changePane(options, pause);
+        });
 
+        // Keyboard events handling
         options.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
                 SceneManager.changePane(options,pause);
@@ -180,7 +212,7 @@ public class GameView implements Observer {
 
         TextFormatter<String> textFormatter = new TextFormatter<>(change -> {
                 if (change.isAdded() && change.getControlNewText().length() > maxLength) {
-                    return null; // Ignora il cambiamento se supera il limite
+                    return null; // Ignore the change if it exceeds the limit
                 }
                 return change;
             });
@@ -198,7 +230,7 @@ public class GameView implements Observer {
             }
 
         textField.setOnKeyPressed(keyEvent -> {
-                ImageView imageView = new ImageView(new Image(GameView.class.getResourceAsStream("definitive/ok.png")));
+                ImageView imageView = new ImageView(new Image(Objects.requireNonNull(GameView.class.getResourceAsStream("definitive/ok.png"))));
                 imageView.setLayoutX(textField.getLayoutX()-SCALE_FACTOR-5);
                 imageView.setLayoutY((double) SceneManager.HEIGHT / 2 - (double) SCALE_FACTOR /2);
                 imageView.setFitHeight(SCALE_FACTOR);
@@ -209,98 +241,62 @@ public class GameView implements Observer {
                     textField.clear();
                     gameContinue.requestFocus();
                     gameContinue.getChildren().add(imageView);
-                    controller.setNick(nickname);
                     PauseTransition pauseTransition = new PauseTransition(Duration.millis(1000));
                     pauseTransition.setOnFinished(event->controller.quitMatch());
                     pauseTransition.play();
                 }
             });
 
-        //TODO se il giocatore ricomincia di propria volontà, non gli faccio salvare il
-        // punteggio, altrimenti si, sia che perda sia che vinca
 
         //################## GAME OVER #################//
         gameOver = SceneManager.createPane("Game Over", true,false);
         gameOver.setVisible(false);
 
-        Label gameOverContinue = SceneManager.getButton("continue", 2, Color.WHITE);
+        Label gameOverContinue = SceneManager.getButton("Continue", 2, Color.WHITE);
 
         gameOverContinue.setOnMouseClicked(mouseEvent -> {
-            //gameOver.getChildren().remove(deathPointsLabel);
+            BackgroundMusic.playClick();
             SceneManager.changePane(gameOver, gameContinue);
         });
 
         deathPointsLabel = new Label();
-        setCentred(deathPointsLabel);
+
         deathPointsLabel.setStyle("-fx-text-fill: white;");
         deathPointsLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
 
         gameOver.getChildren().addAll(gameOverContinue, deathPointsLabel);
 
+
         //################## VICTORY ###################//
-        continueVictory = SceneManager.createPane("continue", true, false);
-        continueVictory.setVisible(false);
-
-        victory = SceneManager.createPane("Victory", true, false);
-        victory.setVisible(false);
-
-        Label victoryNextLevelButton = SceneManager.getButton("nextLevel", 1, Color.WHITE);
-        Label victoryExitButton = SceneManager.getButton("menu", 3, Color.WHITE);
-        Label victoryContinueButton = SceneManager.getButton("continue", 2, Color.WHITE);
-
-        victoryNextLevelButton.setOnMouseClicked(mouseEvent -> controller.nextLevel());
-        victoryExitButton.setOnMouseClicked(mouseEvent -> controller.quitMatch());
-        victoryContinueButton.setOnMouseClicked(mouseEvent -> SceneManager.changePane(victory, gameContinue));
-
-        victory.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
-                controller.quitMatch();
-            }
-        });
-        if (level == 1) {
-            victory.getChildren().addAll(victoryNextLevelButton, victoryExitButton);
-        }
-        else
-            victory.getChildren().add(victoryContinueButton);
+        gameVictory = SceneManager.createPane("Victory", true, false);
+        gameVictory.setVisible(false);
 
 
         //################## GAMEBOARD ################//
-        gameBoard.getChildren().addAll(pause, options , gameOver, victory, gameContinue );
-    }
-
-    private void restart() {
-        controller.restart();
+        gameBoard.getChildren().addAll(pause, options , gameOver, gameVictory, gameContinue );
     }
 
 
     //#################### BOTTOM BAR ################//
-    private void addBottomBar() {
-        // build the bottomBar
 
+    private void addBottomBar() {
+        // Building the bottomBar
         bottomBar.setLayoutX(0);
         bottomBar.setLayoutY((double)SCALE_FACTOR * (MainController.DY-1));
         bottomBar.setPrefHeight(SCALE_FACTOR);
         bottomBar.setPrefWidth(SceneManager.WIDTH);
         bottomBar.setStyle("-fx-background-color: grey");
 
-        // build the labels
+        // Building the labels
         livesLabel = new Label();
         pointsLabel = new Label();
-        timerLabel = new Label("Tempo: 0");
-        nameLabel = new Label();
-
-        nameLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
-        nameLabel.setTextFill(Color.BLACK);
 
         livesLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
         livesLabel.setTextFill(Color.BLACK);
 
         pointsLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
         pointsLabel.setTextFill(Color.BLACK);
-        //pointsLabel.setAlignment(Pos.CENTER_RIGHT);
 
-        nameLabel.setText("player: guest");
-        HBox.setMargin(nameLabel, new Insets(0,0,0,20));
 
         //##################### TEST ####################//
         //TODO remove after test
@@ -326,11 +322,13 @@ public class GameView implements Observer {
     }
 
     private void updatePoints(int totalPoints, int currentPoints, Coordinate coordinate){
+        // Updating both the in-game points label and the post-game points label
+        // to avoid inconsistencies
         String points = "Points: " + totalPoints;
         pointsLabel.setText(points);
         deathPointsLabel.setText(points);
 
-        Label text = SceneManager.getPoints(Integer.toString(currentPoints), coordinate);
+        Label text = SceneManager.getFloatingLabel(Integer.toString(currentPoints), coordinate);
         gameBoard.getChildren().add(text);
         text.setVisible(true);
         text.toFront();
@@ -414,18 +412,13 @@ public class GameView implements Observer {
 
                 case LOAD_POWER_UP_INVINCIBLE -> puInvincible = loadItems(updateInfo.getCoordinate(), BlockImage.INVINCIBLE.getImage());
 
-                case LOAD_NAME -> {
-                    if (updateInfo.getNickname() != null)
-                        nameLabel.setText("player: "+ updateInfo.getNickname());
-                }
+                case UPDATE_BLOCK_DESTROYED -> runBlockDestructionAnimation(removeImageView(randomBlocks, updateInfo.getIndex()));
 
-                case UPDATE_BLOCK_DESTROYED -> {
-                    ImageView imageView = removeImageView(randomBlocks, updateInfo.getIndex());
-                    runBlockDestructionAnimation(imageView);
-                    //runBlockDestructionAnimation(new Coordinate((int)imageView.getLayoutX()/SCALE_FACTOR, (int)imageView.getLayoutY()/SCALE_FACTOR));
-                }
 
-                case UPDATE_ENEMY_DEAD -> removeImageView(enemies, updateInfo.getIndex());
+                case UPDATE_ENEMY_DEAD -> {
+                    removeImageView(enemies, updateInfo.getIndex());
+                    BackgroundMusic.playEnemyDeath();
+                }
 
                 case UPDATE_COINS -> {
                     removeImageView(coins, updateInfo.getIndex());
@@ -482,9 +475,10 @@ public class GameView implements Observer {
     private void gameLost() {
         updateLife(0);
         controller.endMatch();
-        BackgroundMusic.playDeath();
+        BackgroundMusic.playLost();
         PauseTransition pauseGameOver = new PauseTransition(Duration.millis(400));
         pauseGameOver.setOnFinished(event -> {
+            setCentred(deathPointsLabel);
             gameOver.toFront();
             gameOver.setVisible(true);
             gameOver.requestFocus();
@@ -493,15 +487,47 @@ public class GameView implements Observer {
     }
 
     private void gameWin() {
+        updateVictoryPane();
         controller.endMatch();
         BackgroundMusic.playSuccess();
         PauseTransition pauseGameWin = new PauseTransition(Duration.millis(400));
         pauseGameWin.setOnFinished(event -> {
-            victory.toFront();
-            victory.setVisible(true);
-            victory.requestFocus();
+            setCentred(victoryPointsLabel);
+            gameVictory.toFront();
+            gameVictory.setVisible(true);
+            gameVictory.requestFocus();
         });
         pauseGameWin.play();
+    }
+
+    private void updateVictoryPane() {
+        victoryPointsLabel = new Label();
+        victoryPointsLabel.setStyle("-fx-text-fill: white;");
+        victoryPointsLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
+
+        Label victoryNextLevelButton = SceneManager.getButton("nextLevel", 1, Color.WHITE);
+        Label victoryExitButton = SceneManager.getButton("menu", 2, Color.WHITE);
+        Label victoryContinueButton = SceneManager.getButton("Continue", 2, Color.WHITE);
+
+        victoryNextLevelButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            controller.nextLevel();
+        });
+        victoryExitButton.setOnMouseClicked(mouseEvent -> {
+            BackgroundMusic.playClick();
+            SceneManager.changePane(gameVictory, gameContinue);
+        });
+        victoryContinueButton.setOnMouseClicked(mouseEvent ->{
+            BackgroundMusic.playClick();
+            SceneManager.changePane(gameVictory, gameContinue);
+        });
+
+        if (level == 1) {
+            gameVictory.getChildren().addAll(victoryNextLevelButton, victoryExitButton);
+        }
+        else {
+            gameVictory.getChildren().addAll(victoryPointsLabel, victoryContinueButton);
+        }
     }
     //#################### ANIMATION AND MOVEMENT ##################//
 
@@ -548,6 +574,7 @@ public class GameView implements Observer {
     }
 
     private void respawn(int index) {
+        BackgroundMusic.playDeath();
         controller.moving(true);
         controller.setPause(false);
         PauseTransition pauseRespawn = getPauseRespawn();
@@ -631,8 +658,7 @@ public class GameView implements Observer {
         gameBoard.getChildren().remove(currentTntImage);
         currentTntImage = null;
     }
-//TODO quando si crea l'animazione, togliere l'immagine e rimetterla ogni volta è scomodo, sarebbe più comodo se cambiassimo immagine ogni volta;
-// alla fine poi si toglie l'immagine, però appunto, perchè toglierla e rimetterla ogni volta?
+
     private ImageView removeImageView(List<ImageView> imglist, int index) {
         ImageView imgView = imglist.remove(index);
         gameBoard.getChildren().remove(imgView);

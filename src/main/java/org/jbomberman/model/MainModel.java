@@ -15,67 +15,77 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MainModel extends Observable {
+
     private static final int POINTS_FOR_A_COIN = 400;
+
     private static final int POINTS_FOR_AN_ENEMY = 200;
 
-    //private final HashMap<String, Integer> leaderboard = new HashMap<>();
-    private ArrayList<User> leaderboard;
     // how much the character can move every time a key is pressed
     private static final int MOVEMENT = 1;
 
-
-    // LIMITS OF THE MAP
-    private final int _xmax;
-    private final int _ymax;
-    private int _numberOfRandomBlocks = 30;
-    private int _numberOfEnemies = 20;
-    private int _numberOfCoins = 4;
-
-    // the number of lives of the player
-    private int _playerHp;
-
-    private int _points;
-
-
-    private final ArrayList<Coordinate> coordinateGround = new ArrayList<>();
-
-    // the coordinates of the fixed blocks
-    private final ArrayList<Coordinate> coordinatesFixedBlocks = new ArrayList<>();
-
-    // the coordinates of the random blocks (the blocks that can be destroyed)
-    private final ArrayList<Coordinate> coordinatesRandomBlocks = new ArrayList<>();
-
-    private List<Coordinate>  freePositions;
-
-    // the coordinates of the exit door
-    private Coordinate exitDoor;
-
-    // the coordinates of the high potential bomb
-    private Coordinate bombPu;
-
-    // the coordinates of the extra life
-    private Coordinate lifePu;
-
-    // the coordinates of the harmor
-    private Coordinate invinciblePu;
-
-
-    // the coordinates of the enemies
-    private final ArrayList<Coordinate> coordinateEnemies = new ArrayList<>();
-    private final ArrayList<Integer> enemiesHp = new ArrayList<>();
-
-    // the coordinates of the coins
-    private final ArrayList<Coordinate> coins = new ArrayList<>();
-
     private static final ArrayList<KeyCode> KEY_CODES = new ArrayList<>(List.of(KeyCode.UP,KeyCode.DOWN,KeyCode.LEFT,KeyCode.RIGHT));
 
-    // COORDINATES OF THE TNT
+    private ArrayList<User> leaderboard;
+
+    // LIMITS OF THE MAP
+    private final int xMax;
+    private final int yMax;
+
+    private int numberOfRandomBlocks = 20;
+    private int numberOfEnemies = 3;
+    private int numberOfCoins = 4;
+
+    // The coordinates of the ground
+    private final ArrayList<Coordinate> coordinateGround = new ArrayList<>();
+
+    // The coordinates of the fixed blocks (the blocks that can't be destroyed)
+    private final ArrayList<Coordinate> coordinatesFixedBlocks = new ArrayList<>();
+
+    // The coordinates of the random blocks (the blocks that can be destroyed)
+    private final ArrayList<Coordinate> coordinatesRandomBlocks = new ArrayList<>();
+
+    // The coordinates of the coins
+    private final ArrayList<Coordinate> coins = new ArrayList<>();
+
+    // The coordinates of the enemies
+    private final ArrayList<Coordinate> coordinateEnemies = new ArrayList<>();
+
+    // The HP of the enemies
+    private final ArrayList<Integer> enemiesHp = new ArrayList<>();
+
+    // The free positions on the map
+    private List<Coordinate>  freePositions;
+
+    // The coordinates of the exit door
+    private Coordinate exitDoor;
+
+    // The coordinates of the high potential bomb
+    private Coordinate bombPu;
+
+    // The coordinates of the extra life
+    private Coordinate lifePu;
+
+    // The coordinates of the 10 seconds invincibility
+    private Coordinate invinciblePu;
+
+    // The coordinates of the tnt
     private Coordinate tntCoordinates;
+
+    // The number of lives of the player
+    private int playerHp;
+
+    // The currents amount of points of the player
+    private int points;
+
+    // The actual bomb range
     private int bombRange = 1;
 
+    // The actual level
     private int level = 1;
 
+    // The invincibility boolean
     private boolean playerInvincible = false;
+
 
     private Coordinate playerPosition = new Coordinate(1,1);
 
@@ -83,18 +93,16 @@ public class MainModel extends Observable {
 
     private final Random random = new Random();
 
-    private String nickname;
     private boolean doorOpen = false;
 
 //############################# CONSTRUCTOR AND INITIALIZATION ############################//
 
     public MainModel(int dx, int dy) {
-        _xmax = dx-2;
-        _ymax = dy-2-1;
-        _playerHp = 3;
-        _points = 0;
+        xMax = dx-2;
+        yMax = dy-2-1;
+        playerHp = 3;
+        points = 0;
         load();
-        //leaderboard = new ArrayList<>(List.of(new User("matteo", 10, 2), new User("marco", 20, 3)));
     }
 
     public void initialize(){
@@ -107,6 +115,7 @@ public class MainModel extends Observable {
         bombRange = 1;
     }
 
+    // This method resets all the part of the code
     public void reset() {
         coordinateGround.clear();
         coordinatesFixedBlocks.clear();
@@ -130,30 +139,10 @@ public class MainModel extends Observable {
         deleteObservers();
     }
 
-    public int getNumberOfRandomBlocks() {
-        return _numberOfRandomBlocks;
+    public void resetGame(){
+        playerHp = 3;
+        points = 0;
     }
-
-    public void setNumberOfRandomBlocks(int num) {
-        _numberOfRandomBlocks = num;
-    }
-
-    public int getNumberOfEnemies() {
-        return _numberOfEnemies;
-    }
-
-    public void setNumberOfEnemies(int num) {
-        _numberOfEnemies = num;
-    }
-
-    public int getNumberOfCoins() {
-        return _numberOfCoins;
-    }
-
-    public void setNumberOfCoins(int num) {
-        _numberOfCoins = num;
-    }
-
 
 
     public void generateBlocks() {
@@ -161,19 +150,11 @@ public class MainModel extends Observable {
         generateRandomBlocks();
     }
 
-    public void setDifficulty(Difficulty difficulty){
-        switch (difficulty){
-            case EASY -> _numberOfEnemies = 2;
-            case NORMAL -> _numberOfEnemies = 3;
-            case HARD -> _numberOfEnemies = 4;
-            default -> _numberOfEnemies = 0;
-        }
-    }
 
     private void generateBackground() {
         // this is the green ground (1 .. X_MAX, 1 .. Y_MAX)
-        for (int x = 1; x <= _xmax; x += 1) {
-            for (int y = 1; y <= _ymax; y += 1) {
+        for (int x = 1; x <= xMax; x += 1) {
+            for (int y = 1; y <= yMax; y += 1) {
                 coordinateGround.add(new Coordinate(x, y));
             }
         }
@@ -182,8 +163,8 @@ public class MainModel extends Observable {
         freePositions = coordinateGround.stream().filter(p -> p.x() + p.y() > 3).collect(Collectors.toList());
 
         // this generates the fixed checkerboard blocks, removing the corresponding positions from the free positions list
-        for (int x = 1 + 1; x <= _xmax; x += 2) {
-            for (int y = 1 + 1; y <= _ymax; y += 2) {
+        for (int x = 1 + 1; x <= xMax; x += 2) {
+            for (int y = 1 + 1; y <= yMax; y += 2) {
                 var fixedBlock = new Coordinate(x, y);
                 coordinatesFixedBlocks.add(fixedBlock);
                 freePositions.remove(fixedBlock);
@@ -191,10 +172,10 @@ public class MainModel extends Observable {
         }
 
         // this generates the fixed blocks on the edges
-        for (int x = 0; x <= _xmax + 1; x += 1) {
-            for (int y = 0; y <= _ymax + 1; y += 1) {
+        for (int x = 0; x <= xMax + 1; x += 1) {
+            for (int y = 0; y <= yMax + 1; y += 1) {
                 //verifica se la coordinata è ai bordi
-                if (x == 0 || x == _xmax+1 || y == 0 || y == _ymax+1) {
+                if (x == 0 || x == xMax +1 || y == 0 || y == yMax +1) {
                     coordinatesFixedBlocks.add(new Coordinate(x, y));
                 }
             }
@@ -206,22 +187,23 @@ public class MainModel extends Observable {
      * the corresponding coordinates are taken from the free positions list and put in the coordinatesRandomBlocks list.
      */
     private void generateRandomBlocks() {
-        for (int i = 0; i< _numberOfRandomBlocks; i++) {
+        for (int i = 0; i< numberOfRandomBlocks; i++) {
             Coordinate rndBlock = freePositions.remove(random.nextInt(freePositions.size()-1));
             coordinatesRandomBlocks.add(rndBlock);
         }
     }
 
     private void generateItemsAndExitDoor() {
-        // the items are put behind the random blocks; we can use this array also
-        // to prevent the items to stack over the same position
+        // The items are put behind the random blocks; That's why we can use this array to place all
+        // the items correctly and also to prevent the stack of the items over the same position
         ArrayList<Coordinate> availableCoordinates = new ArrayList<>(coordinatesRandomBlocks);
 
-        // generate the exit door
+        // Generate the exit door
         int randomExit = random.nextInt(coordinatesRandomBlocks.size());
         exitDoor = coordinatesRandomBlocks.get(randomExit);
         availableCoordinates.remove(exitDoor);
 
+        //Generate the bigger bomb power up
         int randomFire = random.nextInt(availableCoordinates.size());
         bombPu = availableCoordinates.get(randomFire);
         availableCoordinates.remove(bombPu);
@@ -234,8 +216,8 @@ public class MainModel extends Observable {
         invinciblePu = availableCoordinates.get(randomInvincible);
         availableCoordinates.remove(invinciblePu);
 
-        // generate the coins
-        for (int i = 0; i < _numberOfCoins; i++) {
+        // Generate the coordinates of the coins
+        for (int i = 0; i < numberOfCoins; i++) {
             int randomCoin = random.nextInt(availableCoordinates.size());
             Coordinate coin = availableCoordinates.get(randomCoin);
             availableCoordinates.remove(coin);
@@ -244,8 +226,7 @@ public class MainModel extends Observable {
     }
 
     public void generateEnemies() {
-        System.out.println(_numberOfEnemies);
-        for (int i = 0; i< _numberOfEnemies; i++) {
+        for (int i = 0; i< numberOfEnemies; i++) {
             Coordinate enemy = freePositions.remove(random.nextInt(freePositions.size()-1));
             coordinateEnemies.add(enemy);
             // the number of lives of an enemy depends upon the level
@@ -266,8 +247,7 @@ public class MainModel extends Observable {
 
         tntCoordinates = playerPosition;
 
-        setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_BOMB_RELEASED, tntCoordinates));
+        notifyBombReleased(tntCoordinates);
         return true;
     }
 
@@ -313,14 +293,13 @@ public class MainModel extends Observable {
             int index = coordinateEnemies.indexOf(coordinate);
             coordinateEnemies.remove(coordinate);
             notifyDeadEnemy(index);
-            _points += POINTS_FOR_AN_ENEMY;
+            points += POINTS_FOR_AN_ENEMY;
             notifyPoints(POINTS_FOR_AN_ENEMY, coordinate);
         });
 
         enemiesHpToRemove.forEach(coordinate -> {
             int index = coordinateEnemies.indexOf(coordinate);
             notifyLessLifeEnemy(index);
-            System.out.println(enemiesHp);
         });
 
         notifyExplosion(adjacentCoordinates);
@@ -341,15 +320,15 @@ public class MainModel extends Observable {
     private ArrayList<Triad> getCoordinates() {
         ArrayList<Triad> adjacentCoordinate = new ArrayList<>();
 
-        //Flags to stop the propagation of the bomb in that direction
-        //I'm using these flags because you need to know if the propagation in that direction has encountered an
-        //obstacle the cycle before
+        // Flags to stop the propagation of the bomb in that direction
+        // I'm using these flags because you need to know if the propagation in that direction has encountered an
+        // obstacle the cycle before
         boolean stopUp = false;
         boolean stopDown = false;
         boolean stopLeft = false;
         boolean stopRight = false;
 
-        //Checking every direction, then, if the bomb range is >1, check the external blocks
+        // Checking every direction, then, if the bomb range is >1, check the external blocks
         for (int distance = 1; distance <= bombRange; distance++) {
             Coordinate coordUp = new Coordinate(tntCoordinates.x(), tntCoordinates.y() - distance);
             Coordinate coordDown = new Coordinate(tntCoordinates.x(), tntCoordinates.y() + distance);
@@ -389,8 +368,8 @@ public class MainModel extends Observable {
 
     private void lessLife() {
         if (!playerInvincible) {
-            _playerHp -= 1;
-            if (_playerHp <= 0) {
+            playerHp -= 1;
+            if (playerHp <= 0) {
                 notifyDefeat();
             } else {
                 playerPosition = new Coordinate(1, 1);
@@ -404,7 +383,7 @@ public class MainModel extends Observable {
 //####################################  PLAYER MOVEMENT  ####################################//
     /**
      * Given the key code of the key pressed by the player, changes accordingly its position,
-     * checking if it found the exit or if got more power.
+     * checking if it found the exit or if got a power up or a coin
      * @param keyCode is the code of the key pressed by the player
      */
     public void movePlayer(KeyCode keyCode) {
@@ -412,10 +391,13 @@ public class MainModel extends Observable {
         Coordinate oldPosition = playerPosition;
             Coordinate newPosition = calculateNewPosition(keyCode, playerPosition);
 
+            // If the player can change position, then let him change position
             if (!newPosition.equals(oldPosition) && !collision(newPosition)) {
                 playerPosition = newPosition;
-                notifyPlayerPosition(newPosition, oldPosition, keyCode.getName());
+                notifyPlayerPosition(newPosition, oldPosition);
 
+                // Check if he found the exit and if he can finish the level
+                // Else check if he got a power up or took a coin
                 if (newPosition.equals(exitDoor) && coordinateEnemies.isEmpty()) {
                     notifyVictory();
                 } else if (newPosition.equals(bombPu)) {
@@ -428,11 +410,11 @@ public class MainModel extends Observable {
                     ArrayList<Coordinate> coinsToRemove = new ArrayList<>(coins);
                     coinsToRemove.forEach(coordinate -> {
                         if (newPosition.equals(coordinate)) {
-                            //notifico che il player è passato sulla moneta quindi si può togliere
+                            // Notify the removal of the coin
                             notifyCoin(coins.indexOf(coordinate));
                             coins.remove(coordinate);
-                            //notifico l'aggiunta dei punti
-                            _points += POINTS_FOR_A_COIN;
+                            // Notify the addition of the points
+                            points += POINTS_FOR_A_COIN;
                             notifyPoints(POINTS_FOR_A_COIN, coordinate);
                         }
                     });
@@ -463,19 +445,10 @@ public class MainModel extends Observable {
             }
         }
 
-        int newX = clamp(currentPosition.x() + deltaX, 1, _xmax);
-        int newY = clamp(currentPosition.y() + deltaY, 1, _ymax);
+        int newX = clamp(currentPosition.x() + deltaX, 1, xMax);
+        int newY = clamp(currentPosition.y() + deltaY, 1, yMax);
 
         return new Coordinate(newX, newY);
-    }
-    /**
-     * A coordinate is valid if it is not already occupied by a fixed block or by another random block. Furthermore we
-     * should leave cleared the positions that are adiacent to the origin, where the player is initially positioned.
-     * @param c: the coordinate to evaluate
-     * @return if it is a valid location
-     */
-    private boolean isValidLocation(Coordinate c) {
-        return !coordinatesFixedBlocks.contains(c) && (c.x() + c.y() > 3)&& !coordinatesRandomBlocks.contains(c);
     }
 
     /**
@@ -504,9 +477,9 @@ public class MainModel extends Observable {
 //####################################  NOTIFICATIONS  ####################################//
     public void notifyModelReady() {
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.LOAD_POINTS, _points));
+        notifyObservers(new UpdateInfo(UpdateType.LOAD_POINTS, points));
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.LOAD_LIFE, _playerHp));
+        notifyObservers(new UpdateInfo(UpdateType.LOAD_LIFE, playerHp));
         setChanged();
         notifyObservers(new UpdateInfo(UpdateType.LEVEL, level));
         setChanged();
@@ -529,58 +502,86 @@ public class MainModel extends Observable {
         notifyObservers(new UpdateInfo(UpdateType.LOAD_PLAYER, playerPosition));
         setChanged();
         notifyObservers(new UpdateInfo(UpdateType.LOAD_ENEMIES, coordinateEnemies));
-        setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.LOAD_NAME, nickname));
     }
 
+    /**
+     * Notify that the bomb has been released
+     * @param tnt The coordinates where the tnt needs to be drawn
+     */
+    private void notifyBombReleased(Coordinate tnt){
+        setChanged();
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_BOMB_RELEASED, tnt));
+    }
+
+    /**
+     * Notify that a block has been removed
+     * @param blockToRemove The index of the block to be removed
+     */
     private void notifyBlockRemoved(int blockToRemove) {
         setChanged();
         notifyObservers(new UpdateInfo(UpdateType.UPDATE_BLOCK_DESTROYED, blockToRemove));
     }
 
-    // quando viene ucciso un nemico, i punti compariranno sopra di esso
-    // quando invece è il giocatore a passare sopra a un item che da punti, i punti compariranno
-    // sopra il giocatore
+
     /**
-     * notifica se il player è passato su una moneta
-     * @param i
+     * Notify that a coin has been taken
+     * @param coinToRemove The index of the coin to be removed
      */
-    private void notifyCoin(int i) {
+    private void notifyCoin(int coinToRemove) {
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_COINS,i));
-    }
-    private void notifyPoints(int currentPoints, Coordinate coordinate) {
-
-        System.out.println(_points);
-
-        setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_POINTS, coordinate, _points, currentPoints));
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_COINS,coinToRemove));
     }
 
-    private void notifyLessLifeEnemy(int index) {
+    /**
+     * Notify that points have been earned
+     * @param earnedPoints The amount of points that have been added
+     * @param pointsCoordinates The coordinates of where the points have been earned
+     */
+    private void notifyPoints(int earnedPoints, Coordinate pointsCoordinates) {
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_ENEMY_LIFE, index));
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_POINTS, pointsCoordinates, points, earnedPoints));
     }
 
+    /**
+     * Notify that an enemy has lost a life
+     * @param enemyWithLessLife The index of the enemy that has lost a life
+     */
+    private void notifyLessLifeEnemy(int enemyWithLessLife) {
+        setChanged();
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_ENEMY_LIFE, enemyWithLessLife));
+    }
+
+    /**
+     * Notify that the door is now open
+     */
     private void notifyOpenedDoor() {
         setChanged();
         notifyObservers(new UpdateInfo(UpdateType.UPDATE_DOOR));
     }
 
-    private void notifyDeadEnemy(int index) {
+    /**
+     * Notify that an enemy has been killed
+     * @param deadEnemy the index of the enemy that is now dead
+     */
+    private void notifyDeadEnemy(int deadEnemy) {
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_ENEMY_DEAD, index));
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_ENEMY_DEAD, deadEnemy));
     }
 
-    public void notifyPlayerPosition(Coordinate coordinate, Coordinate oldPosition, String name) {
+    /**
+     * Notify that the player has changed position
+     * @param newPosition The new player position
+     * @param oldPosition The old player position
+     */
+    public void notifyPlayerPosition(Coordinate newPosition, Coordinate oldPosition) {
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_POSITION, oldPosition,coordinate, name, -1));
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_POSITION, oldPosition,newPosition, -1));
         controlPosition();
     }
 
     private void notifyLessLife() {
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_RESPAWN, playerPosition, _playerHp));
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_RESPAWN, playerPosition, playerHp));
     }
 
     private void notifyExplosion(ArrayList<Triad> triadArrayList) {
@@ -596,10 +597,10 @@ public class MainModel extends Observable {
     }
 
     public void notifyPULife(){
-        _playerHp += 1;
+        playerHp += 1;
         lifePu = null;
         setChanged();
-        notifyObservers(new UpdateInfo(UpdateType.UPDATE_PU_LIFE, _playerHp));
+        notifyObservers(new UpdateInfo(UpdateType.UPDATE_PU_LIFE, playerHp));
     }
 
     public void notifyPUInvincible(){
@@ -682,22 +683,10 @@ public class MainModel extends Observable {
         return leaderboard;
     }
 
-    public void resetGame(){
-        _playerHp = 3;
-        _points = 0;
-    }
-
     public void setLevel(int level) {
         this.level = level;
     }
 
-    public int getLevel(){
-        return level;
-    }
-
-    public void setShownNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
     public void setPlayer(String name) {
         //using the returning Optional value of the stream to check if the player is already present in the leaderboard
@@ -708,13 +697,13 @@ public class MainModel extends Observable {
         if (existingUser.isPresent()) {
             User user = existingUser.get();
             //checking if
-            if (_points > user.score() || level > user.level()) {
-                user = new User(name, _points, level);
+            if (points > user.score() || level > user.level()) {
+                user = new User(name, points, level);
                 leaderboard.remove(existingUser.get());
                 leaderboard.add(user);
             }
         } else {
-            User user = new User(name, _points, level);
+            User user = new User(name, points, level);
             leaderboard.add(user);
         }
     }

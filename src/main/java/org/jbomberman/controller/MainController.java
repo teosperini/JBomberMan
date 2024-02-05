@@ -8,8 +8,7 @@ import javafx.util.Duration;
 import org.jbomberman.model.MainModel;
 import org.jbomberman.model.User;
 import org.jbomberman.utils.BackgroundMusic;
-import org.jbomberman.utils.Difficulty;
-import org.jbomberman.utils.SceneManager;
+import org.jbomberman.view.SceneManager;
 import org.jbomberman.view.GameView;
 import org.jbomberman.view.MenuView;
 import javafx.scene.Parent;
@@ -18,8 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 
 
 public class MainController {
@@ -39,7 +37,6 @@ public class MainController {
     private boolean pause = false;
 
     private static MainController instance;
-    private Difficulty difficulty = Difficulty.NORMAL;
 
     private MainController() {
     }
@@ -60,8 +57,6 @@ public class MainController {
         //creazione model
         model = new MainModel(DX, DY);
         model.setLevel(1);
-        //difficulty = Difficulty.NORMAL;
-        //model.setDifficulty(difficulty);
 
         //creazione menu
         menuView = new MenuView();
@@ -73,21 +68,14 @@ public class MainController {
         scene = new Scene(root, SceneManager.WIDTH, SceneManager.HEIGHT);
         stage.setScene(scene);
         stage.show();
-        System.out.println("la larghezza dello stage è " + stage.getWidth());
+        BackgroundMusic.playMenuMusic();
     }
 
     //################ NEW GAME ################//
 
-    public void newPlayer(String player){
-        model.setPlayer(player);
-    }
-    public ArrayList<User> loadLeaderboard() {
-        // TODO caricherà i dati dal model quando ci sarà il file json
-        //  alla fine di ogni partita sarà richiesto di inserire il nome (altrimenti "guest")
-        //  e verrà salvato insieme al punteggio raggiunto e al livello raggiunto (completato)
+    public List<User> loadLeaderboard() {
         return model.getLeaderboard();
     }
-
     //HANDLING OF THE KEY-EVENTS IN GAME
 
     public void handleGameKeyEvent(KeyEvent keyEvent) {
@@ -117,7 +105,6 @@ public class MainController {
         gameView.pauseView();
         mobMovement.pause();
     }
-
     public void resumeController() {
         pause = false;
         gameView.resumeView();
@@ -132,9 +119,6 @@ public class MainController {
         this.pause = pause;
     }
 
-    public void setDifficulty(Difficulty difficulty){
-        this.difficulty = difficulty;
-    }
 
     private void setTimeline(){
         mobMovement = new Timeline(
@@ -149,19 +133,20 @@ public class MainController {
     }
 
 
-    //irreversibly stops the game
+    // Irreversibly stops the game, preparing it for the after-game Panes
     public void endMatch(){
         if (BackgroundMusic.isPlaying()) {
-            BackgroundMusic.stopMusic();
+            BackgroundMusic.stopGameMusic();
         }
         mobMovement.stop();
         pause = true;
     }
 
-    //returns to the main menu
+    // Returns to the main menu, resetting the model
     public void quitMatch() {
         model.save();
         scene.setRoot(menuView.getMenu());
+        BackgroundMusic.playMenuMusic();
 
         model.deleteObservers();
         model.addObserver(menuView);
@@ -171,25 +156,26 @@ public class MainController {
         model.setLevel(1);
         model.resetGame();
     }
-
     public void playButtonPressed() {
-        // preparing the model
+        if (BackgroundMusic.isMenuPlaying()) {
+            BackgroundMusic.stopMenuMusic();
+        }
         model.initialize();
-
-        //deleting all the previous observers
         model.deleteObservers();
 
-        //preparing the view
         gameView = new GameView();
+
+        // Adding the view as an observer
         model.addObserver(gameView);
         model.notifyModelReady();
+
         gameView.initialize();
 
         if (!BackgroundMusic.isPlaying()) {
-            BackgroundMusic.playMusic();
+            BackgroundMusic.playGameMusic();
         } else {
-            BackgroundMusic.stopMusic();
-            BackgroundMusic.playMusic();
+            BackgroundMusic.stopGameMusic();
+            BackgroundMusic.playGameMusic();
         }
 
         //setting the scene
@@ -202,37 +188,35 @@ public class MainController {
         setTimeline();
     }
 
-    public void restart(){
-        model.reset();
-        model.setLevel(1);
-        model.resetGame();
-        playButtonPressed();
-    }
-
     public void nextLevel(){
         model.reset();
         model.setLevel(2);
         playButtonPressed();
     }
 
-    public void stopMusic(){
-        BackgroundMusic.stopMusic();
+    public void newPlayer(String player){
+        model.setPlayer(player);
     }
+
+    public void stopMusic(){
+        BackgroundMusic.stopGameMusic();
+    }
+    public void playMusic() {
+        BackgroundMusic.playGameMusic();
+    }
+
     //############## CLOSE THE WINDOW #############//
 
     public void gameExit() {
+
         stage.close();
     }
-
     //##################### TEST ####################//
+
     //TODO remove after test
 
     public void removeBlocks() {
         model.removeRandom();
-    }
-
-    public void setNick(String nickname) {
-        model.setShownNickname(nickname);
     }
 
     //###############################################//

@@ -1,4 +1,4 @@
-package org.jbomberman.utils;
+package org.jbomberman.view;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.jbomberman.controller.MainController;
+import org.jbomberman.utils.Coordinate;
 
 public class SceneManager {
 
@@ -27,7 +28,7 @@ public class SceneManager {
      * opacity and main can't be true at the same time
      * if neither opacity nor main is true, the pane is used for the main menu (except for the main screen
      * of the main menu)
-     * @return
+     * @return the pane
      */
     public static Pane createPane(String string, boolean opacity, boolean main) {
         if (opacity && main) {
@@ -69,7 +70,6 @@ public class SceneManager {
         ImageView imageView = new ImageView(new Image(SceneManager.class.getResourceAsStream("/org/jbomberman/sfondo_small.jpg")));
         imageView.setFitHeight(HEIGHT);
         imageView.setFitWidth(WIDTH);
-        System.out.println("la larghezza è " + WIDTH);
         if (opacity) imageView.setOpacity(0);
         return new Pane(imageView);
     }
@@ -111,7 +111,7 @@ public class SceneManager {
         toShow.requestFocus();
     }
 
-    public static Label getPoints(String string, Coordinate coordinate){
+    public static Label getFloatingLabel(String string, Coordinate coordinate){
         Label text = new Label("+" + string);
         text.setFont(CUSTOM_FONT_SMALL);
         text.setLayoutX(((double)coordinate.x() * SCALE_FACTOR)-30);
