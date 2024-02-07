@@ -8,10 +8,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.jbomberman.utils.BackgroundMusic;
 
-import java.util.Observable;
-import java.util.Observer;
-
-public class MenuView implements Observer{
+/**
+ * This is the class that creates the view of the menu
+ * It does not implement Observer/Observable as it does not need
+ * to be notified by the model
+ */
+public class MenuView {
 
     private final AnchorPane menu = new AnchorPane();
     private Pane mainMenu;
@@ -27,12 +29,15 @@ public class MenuView implements Observer{
         controller = MainController.getInstance();
         leader = new LeaderboardView();
         leaderboard = leader.getLeaderboardPane();
-        buttons();
+        paneAndButtons();
     }
 
-
-    private void buttons() {
+    /**
+     * This method creates all the panes and the buttons in the MenuView
+     */
+    private void paneAndButtons() {
         Color color = Color.WHITE;
+        //################### MAIN MENU ##################//
         mainMenu = ViewUtilities.createPane("JBomberMan", false, true);
         mainMenu.setVisible(true);
 
@@ -73,42 +78,6 @@ public class MenuView implements Observer{
         leaderboard.getChildren().add(leaderboardBackButton);
 
         menu.getChildren().addAll(mainMenu, leaderboard);
-    }
-
-
-    /**
-     * Updates the menu
-     * @param o     the observable object.
-     * @param arg   an argument passed to the {@code notifyObservers}
-     *                 method.
-     */
-    @Override
-    public void update(Observable o, Object arg) {
-        /*
-        if (arg instanceof UpdateInfo updateInfo) {
-            UpdateType updateType = updateInfo.getUpdateType();
-
-            switch (updateType) {
-                case PAUSE -> {
-                    options.setVisible(true);
-                    options.requestFocus();
-                }
-                case END_PAUSE -> {
-                    profile.setVisible(false);
-                    options.setVisible(false);
-                    menu.requestFocus();
-                }
-                case GAME_EXIT -> {
-                    controller.gameExit();
-                }
-                case PROFILE_LOADER -> {
-                    profile.setVisible(true);
-                    profile.requestFocus();
-                }
-            }
-        }
-
-         */
     }
 
     /**

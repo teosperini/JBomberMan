@@ -69,8 +69,6 @@ public class MainController {
         menuView = new MenuView();
         menuView.initialize();
 
-        model.addObserver(menuView);
-
         Parent root = menuView.getMenu();
         scene = new Scene(root, ViewUtilities.WIDTH, ViewUtilities.HEIGHT);
         stage.setScene(scene);
@@ -218,8 +216,6 @@ public class MainController {
         BackgroundMusic.playMenuMusic();
 
         model.deleteObservers();
-        model.addObserver(menuView);
-
 
         model.reset();
         model.resetGame();

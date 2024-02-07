@@ -11,12 +11,15 @@ import org.jbomberman.model.User;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * This class is used to represent the leaderboard in the MainView
+ */
 public class LeaderboardView {
 
     private final MainController controller = MainController.getInstance();
     private final Pane leaderboardPane = ViewUtilities.createPane("Leaderboard", false, false);
     private final ScrollPane scrollPane = new ScrollPane();
-    private final VBox contentPane = new VBox(2); //lo spazio tra le scritte
+    private final VBox contentPane = new VBox(2);
 
     public LeaderboardView() {
         genScrollPane();
@@ -24,6 +27,9 @@ public class LeaderboardView {
         leaderboardPane.getChildren().add(scrollPane);
     }
 
+    /**
+     * This method generates the view of the leaderboard
+     */
     private void genScrollPane() {
         scrollPane.setPrefSize(400, 200);
         contentPane.setAlignment(Pos.CENTER);
@@ -37,8 +43,11 @@ public class LeaderboardView {
         ViewUtilities.setCentred(scrollPane);
     }
 
+    /**
+     * This method updates the view of the leaderboard
+     */
     public void updateScrollPane() {
-        contentPane.getChildren().clear(); // Rimuove tutti i label attuali
+        contentPane.getChildren().clear();
         contentPane.setAlignment(Pos.CENTER_LEFT);
 
         List<User> leaderboard = controller.loadLeaderboard();

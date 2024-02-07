@@ -12,6 +12,9 @@ import javafx.scene.text.Text;
 import org.jbomberman.controller.MainController;
 import org.jbomberman.utils.Coordinate;
 
+/**
+ * This class contains some utilities for the views
+ */
 public class ViewUtilities {
 
     public static final int SCALE_FACTOR = 35;
@@ -22,7 +25,6 @@ public class ViewUtilities {
 
 
     /**
-     *
      * @param string the name of the main text
      * @param opacity set true if the pane needs to be used in game
      * @param main set true if the pane needs to be used as the main pane for the main menu
@@ -41,11 +43,11 @@ public class ViewUtilities {
         Text text = new Text(string);
 
         if (opacity) {
-            pane = getPaneImage(true);
+            pane = getPaneBackground(true);
             pane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
 
         }else {
-            pane = getPaneImage(false);
+            pane = getPaneBackground(false);
         }
 
         if (main) {
@@ -66,8 +68,12 @@ public class ViewUtilities {
         return pane;
     }
 
-    private static Pane getPaneImage(boolean opacity) {
-        //l'immagine la carico comunque, ma differenzio tra menu e gioco perchè nel gioco l'immagine la rendo invisibile
+    /**
+     * This method is used to create the pane with or without the background
+     * @param opacity to set the opacity of the background
+     * @return
+     */
+    private static Pane getPaneBackground(boolean opacity) {
         ImageView imageView = new ImageView(new Image(ViewUtilities.class.getResourceAsStream("/org/jbomberman/sfondo_small.jpg")));
         imageView.setFitHeight(HEIGHT);
         imageView.setFitWidth(WIDTH);
@@ -75,6 +81,13 @@ public class ViewUtilities {
         return new Pane(imageView);
     }
 
+    /**
+     * This method returns a button that highlights itself when the mouse goes over it
+     * @param text text of the button
+     * @param i fixed position of the button
+     * @param color color of the button
+     * @return
+     */
     public static Label getButton(String text, int i, Color color) {
         Text textNode = new Text(text);
         textNode.setFont(CUSTOM_FONT_SMALL);
@@ -105,6 +118,11 @@ public class ViewUtilities {
 
     }
 
+    /**
+     * This method is used to switch pane in a view
+     * @param toHide
+     * @param toShow
+     */
     public static void changePane(Pane toHide, Pane toShow) {
         toHide.setVisible(false);
         toShow.setVisible(true);
@@ -112,6 +130,12 @@ public class ViewUtilities {
         toShow.requestFocus();
     }
 
+    /**
+     * this method returns the labels that are going to represent the floating points in the game
+     * @param string the points
+     * @param coordinate
+     * @return
+     */
     public static Label getFloatingLabel(String string, Coordinate coordinate){
         Label text = new Label("+" + string);
         text.setFont(CUSTOM_FONT_SMALL);
@@ -120,16 +144,25 @@ public class ViewUtilities {
         return text;
     }
 
-
-    public static ImageView createImageView(Coordinate c, Image image) {
+    /**
+     * This method create an ImageView of a fixed dimension
+     * @param coordinate
+     * @param image
+     * @return
+     */
+    public static ImageView createImageView(Coordinate coordinate, Image image) {
         ImageView imageView = new ImageView(image);
-        imageView.setLayoutX((double)c.x() * SCALE_FACTOR);
-        imageView.setLayoutY((double)c.y() * SCALE_FACTOR);
+        imageView.setLayoutX((double)coordinate.x() * SCALE_FACTOR);
+        imageView.setLayoutY((double)coordinate.y() * SCALE_FACTOR);
         imageView.setFitHeight(SCALE_FACTOR);
         imageView.setFitWidth(SCALE_FACTOR);
         return imageView;
     }
 
+    /**
+     * This method centers the given node
+     * @param node the node to center
+     */
     public static void setCentred(Node node){
         Platform.runLater(() -> {
             double textWidth = node.getLayoutBounds().getWidth();
