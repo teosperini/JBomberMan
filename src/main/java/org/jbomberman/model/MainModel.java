@@ -15,6 +15,12 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The MainModel is the class that maintains the status of the game and that
+ * implements all the game logics.
+ * It is the Model of the MVC Pattern and is the Observable of the Observer/Observable pattern
+ * responsible to notify the View of its status changes.
+ */
 public class MainModel extends Observable {
 
     private static final int POINTS_FOR_A_COIN = 400;
@@ -100,7 +106,6 @@ public class MainModel extends Observable {
 //############################# CONSTRUCTOR AND INITIALIZATION ############################//
 
     /**
-     * This is the constructor of the Model
      * @param dx the width of the area
      * @param dy the height of the area
      */
