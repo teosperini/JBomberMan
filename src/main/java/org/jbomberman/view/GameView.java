@@ -699,12 +699,12 @@ public class GameView implements Observer {
         String path = "explosion/" + i;
         triadArrayList.forEach(triad -> {
             ImageView imageView;
-            if (triad.getDirection().equals(Direction.CENTER)) {
-                imageView = createImageView(triad.getCoordinate(), new Image(Objects.requireNonNull(GameView.class.getResourceAsStream( path + "/center.png"))));
+            if (triad.direction().equals(Direction.CENTER)) {
+                imageView = createImageView(triad.coordinate(), new Image(Objects.requireNonNull(GameView.class.getResourceAsStream( path + "/center.png"))));
             } else if (triad.isLast()) {
-                imageView = createImageView(triad.getCoordinate(), new Image(Objects.requireNonNull(GameView.class.getResourceAsStream(path +"/" + triad.getDirection().getKeyCode() + "_external.png"))));
+                imageView = createImageView(triad.coordinate(), new Image(Objects.requireNonNull(GameView.class.getResourceAsStream(path +"/" + triad.direction().getKeyCode() + "_external.png"))));
             } else {
-                imageView = createImageView(triad.getCoordinate(), new Image(Objects.requireNonNull(GameView.class.getResourceAsStream(path +"/" + triad.getDirection().getKeyCode() + ".png"))));
+                imageView = createImageView(triad.coordinate(), new Image(Objects.requireNonNull(GameView.class.getResourceAsStream(path +"/" + triad.direction().getKeyCode() + ".png"))));
             }
             bombExplosion.add(imageView);
             gameBoard.getChildren().add(imageView);

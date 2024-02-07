@@ -87,36 +87,51 @@ public class MainModel extends Observable {
     // The invincibility boolean
     private boolean playerInvincible = false;
 
-
     private Coordinate playerPosition = new Coordinate(1,1);
-
-
 
     private final Random random = new Random();
 
+    // The door boolean
     private boolean doorOpen = false;
+
+    // The bomb boolean
+    boolean isBombExploding = false;
 
 //############################# CONSTRUCTOR AND INITIALIZATION ############################//
 
+    /**
+     * This is the constructor of the Model
+     * @param dx the width of the area
+     * @param dy the height of the area
+     */
     public MainModel(int dx, int dy) {
         xMax = dx-2;
         yMax = dy-2-1;
         playerHealthPoint = 3;
         points = 0;
-        load();
+        loadLeaderboardFromFile();
     }
 
+    /**
+     * Generates the position of the random blocks, the enemies,
+     * the power ups, the exit door and the coins
+     * Initialize the player position and the bomb range
+     */
     public void initialize(){
         generateBlocks();
-        generateItemsAndExitDoor();
-        generateEnemies();
+        generateItemsAndExitDoorPositions();
+        generateEnemiesPositions();
 
         playerPosition = new Coordinate(1,1);
 
         bombRange = 1;
     }
 
-    // This method resets all the part of the code
+    /**
+     *  This method resets the positions of the random blocks, the enemies,
+     *  the power ups, the exit door and the coins; except for the lives and the points
+     *  This method is used when the user goes to the next level
+     */
     public void reset() {
         coordinateGround.clear();
         coordinatesFixedBlocks.clear();
@@ -140,30 +155,32 @@ public class MainModel extends Observable {
         deleteObservers();
     }
 
+    /**
+     * This method resets the parts that the other method doesn't
+     * It's used when the player quit the game to the main menu
+     */
     public void resetGame(){
         playerHealthPoint = 3;
         points = 0;
     }
 
-
-    public void generateBlocks() {
+    private void generateBlocks() {
         generateBackground();
-        generateRandomBlocks();
+        generateRandomBlocksPositions();
     }
 
-
     private void generateBackground() {
-        // this is the green ground (1 .. X_MAX, 1 .. Y_MAX)
+        // This is the green ground (1 .. X_MAX, 1 .. Y_MAX)
         for (int x = 1; x <= xMax; x += 1) {
             for (int y = 1; y <= yMax; y += 1) {
                 coordinateGround.add(new Coordinate(x, y));
             }
         }
 
-        // at the beginning the free positions are all the green ground positions, except the ones of the first corner
+        // At the beginning the free positions are all the green ground positions, except the ones of the first corner
         freePositions = coordinateGround.stream().filter(p -> p.x() + p.y() > 3).collect(Collectors.toList());
 
-        // this generates the fixed checkerboard blocks, removing the corresponding positions from the free positions list
+        // This generates the fixed checkerboard blocks, removing the corresponding positions from the free positions list
         for (int x = 1 + 1; x <= xMax; x += 2) {
             for (int y = 1 + 1; y <= yMax; y += 2) {
                 var fixedBlock = new Coordinate(x, y);
@@ -175,7 +192,6 @@ public class MainModel extends Observable {
         // this generates the fixed blocks on the edges
         for (int x = 0; x <= xMax + 1; x += 1) {
             for (int y = 0; y <= yMax + 1; y += 1) {
-                //verifica se la coordinata è ai bordi
                 if (x == 0 || x == xMax +1 || y == 0 || y == yMax +1) {
                     coordinatesFixedBlocks.add(new Coordinate(x, y));
                 }
@@ -184,17 +200,17 @@ public class MainModel extends Observable {
     }
 
     /**
-     * Generate NUM_RND_BLOCKS random blocks in the range 1 .. XMAX-1, 1 .. YMAX-1;
+     * Generate NUM_RND_BLOCKS random blocks in the range 1 .. xMax-1, 1 .. yMax-1
      * the corresponding coordinates are taken from the free positions list and put in the coordinatesRandomBlocks list.
      */
-    private void generateRandomBlocks() {
+    private void generateRandomBlocksPositions() {
         for (int i = 0; i< numberOfRandomBlocks; i++) {
             Coordinate rndBlock = freePositions.remove(random.nextInt(freePositions.size()-1));
             coordinatesRandomBlocks.add(rndBlock);
         }
     }
 
-    private void generateItemsAndExitDoor() {
+    private void generateItemsAndExitDoorPositions() {
         // The items are put behind the random blocks; That's why we can use this array to place all
         // the items correctly and also to prevent the stack of the items over the same position
         ArrayList<Coordinate> availableCoordinates = new ArrayList<>(coordinatesRandomBlocks);
@@ -226,21 +242,23 @@ public class MainModel extends Observable {
         }
     }
 
-    public void generateEnemies() {
+    private void generateEnemiesPositions() {
         for (int i = 0; i< numberOfEnemies; i++) {
             Coordinate enemy = freePositions.remove(random.nextInt(freePositions.size()-1));
             coordinateEnemies.add(enemy);
-            // the number of lives of an enemy depends upon the level
+            // The number of lives of an enemy depends upon the level
             enemiesHp.add(level);
         }
     }
 
 
-
 //######################################  TNT  ######################################//
 
-    boolean isBombExploding = false;
-
+    /**
+     * This method try to release the bomb
+     * @return false if the bomb is already deployed or the player is in the "safe zone" (his spawn block)
+     *         true if the bomb has been released
+     */
     public boolean releaseBomb() {
         if (tntCoordinates != null || Objects.equals(playerPosition, new Coordinate(1, 1))){
             return false;
@@ -252,20 +270,22 @@ public class MainModel extends Observable {
         return true;
     }
 
+    /**
+     * This method calculates what has been hit during the explosion
+     */
     public void explodeBomb() {
         Set<Coordinate> blocksToRemove = new HashSet<>();
         Set<Coordinate> enemiesToRemove = new HashSet<>();
         Set<Coordinate> enemiesHpToRemove = new HashSet<>();
 
-        //with getCoordinates() I get every coordinates that needs to be checked
         ArrayList<Triad> adjacentCoordinates = getCoordinates();
         adjacentCoordinates.add(new Triad(tntCoordinates, Direction.CENTER, true));
 
         for (Triad terna : adjacentCoordinates) {
-            Coordinate coord = terna.getCoordinate();
+            Coordinate coord = terna.coordinate();
 
             if (playerPosition.equals(coord)) {
-                lessLife();
+                decreasePlayerLife();
             }
 
             if (coordinatesRandomBlocks.contains(coord)) {
@@ -307,17 +327,22 @@ public class MainModel extends Observable {
         tntCoordinates = null;
         isBombExploding = false;
 
-        openTheDoor();
+        checkAndOpenTheDoor();
     }
 
-    private void openTheDoor() {
+
+    private void checkAndOpenTheDoor() {
         if (!doorOpen && coordinateEnemies.isEmpty()){
             notifyOpenedDoor();
             doorOpen = true;
         }
     }
 
-
+    /**
+     * This method calculates the coordinates affected by the bomb explosion
+     * @return a List of Triads, where each Triad contains the coordinate, the direction, and a
+     * boolean that is true if that is the last coordinate in that direction
+     */
     private ArrayList<Triad> getCoordinates() {
         ArrayList<Triad> adjacentCoordinate = new ArrayList<>();
 
@@ -367,7 +392,7 @@ public class MainModel extends Observable {
 
 //####################################  POWER UPS AND LIFE  ####################################//
 
-    private void lessLife() {
+    private void decreasePlayerLife() {
         if (!playerInvincible && playerHealthPoint > 0) {
             playerHealthPoint -= 1;
             if (playerHealthPoint <= 0) {
@@ -378,7 +403,6 @@ public class MainModel extends Observable {
             }
         }
     }
-
 
 
 //####################################  PLAYER MOVEMENT  ####################################//
@@ -460,6 +484,7 @@ public class MainModel extends Observable {
     private int clamp(int value, int min, int max) {
         return Math.max(min, Math.min(max, value));
     }
+
     /**
      * Checks if the given coordinate collides with an existing fixed block or random block.
      * @param coordinate the coordinate to check
@@ -468,9 +493,10 @@ public class MainModel extends Observable {
     private boolean collision(Coordinate coordinate) {
         return (coordinatesFixedBlocks.contains(coordinate) || coordinatesRandomBlocks.contains(coordinate) || coordinate.equals(tntCoordinates));
     }
-    private void controlPosition() {
+
+    private void checkFatalCollision() {
         if(coordinateEnemies.contains(playerPosition)){
-            lessLife();
+            decreasePlayerLife();
         }
     }
 
@@ -552,9 +578,6 @@ public class MainModel extends Observable {
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_ENEMY_LIFE).setIndex(enemyWithLessLife).build());
     }
 
-    /**
-     * Notify that the door is now open
-     */
     private void notifyOpenedDoor() {
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_DOOR).build());
@@ -562,11 +585,11 @@ public class MainModel extends Observable {
 
     /**
      * Notify that an enemy has been killed
-     * @param deadEnemy the index of the enemy that is now dead
+     * @param deadEnemyIdx the index of the enemy that is now dead
      */
-    private void notifyDeadEnemy(int deadEnemy) {
+    private void notifyDeadEnemy(int deadEnemyIdx) {
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_ENEMY_DEAD).setIndex(deadEnemy).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_ENEMY_DEAD).setIndex(deadEnemyIdx).build());
     }
 
     /**
@@ -574,10 +597,10 @@ public class MainModel extends Observable {
      * @param newPosition The new player position
      * @param oldPosition The old player position
      */
-    public void notifyPlayerPosition(Coordinate newPosition, Coordinate oldPosition) {
+    private void notifyPlayerPosition(Coordinate newPosition, Coordinate oldPosition) {
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_POSITION).setNewPosition(newPosition).setOldPosition(oldPosition).setIndex(-1).build());
-        controlPosition();
+        checkFatalCollision();
     }
 
     private void notifyLessLife() {
@@ -585,19 +608,23 @@ public class MainModel extends Observable {
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_RESPAWN).setHealthPoint(playerHealthPoint).build());
     }
 
-    private void notifyExplosion(ArrayList<Triad> triadArrayList) {
+    /**
+     * Notify the explosion path
+     * @param triadList the list of the Triads
+     */
+    private void notifyExplosion(List<Triad> triadList) {
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_EXPLOSION).setTriadList(triadArrayList).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_EXPLOSION).setTriadList(triadList).build());
     }
 
-    public void notifyPUExplosion(){
+    private void notifyPUExplosion(){
         bombRange += 1;
         bombPu = null;
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_PU_BOMB).build());
     }
 
-    public void notifyPULife(){
+    private void notifyPULife(){
         playerHealthPoint += 1;
         lifePu = null;
         setChanged();
@@ -631,20 +658,22 @@ public class MainModel extends Observable {
     private void notifyEnemyMovement(Coordinate oldPosition, Coordinate newPosition, int enemyId, KeyCode keyCode) {
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_POSITION).setOldPosition(oldPosition).setNewPosition(newPosition).setIndex(enemyId).setKeyCode(keyCode).setEnemyLastLife(enemiesHp.get(enemyId) == 1).build());
-        controlPosition();
+        checkFatalCollision();
     }
 
 
-
-
 //########################################  ENEMIES  ########################################//
+
+    /**
+     * Generate the new positions for the enemies
+     */
     public void moveEnemies() {
         for (int i = 0; i< coordinateEnemies.size(); i++) {
             calculateNewEnemyPosition(i);
         }
     }
 
-    public void calculateNewEnemyPosition(int enemyId) {
+    private void calculateNewEnemyPosition(int enemyId) {
         Coordinate oldEnemyPosition = coordinateEnemies.get(enemyId);
         int randomInt = random.nextInt(KEY_CODES.size());
         Coordinate newEnemyPosition;
@@ -663,6 +692,11 @@ public class MainModel extends Observable {
         }
     }
 
+    /**
+     * This method ensure that the enemies won't enter the safe zone
+     * @param newEnemyPosition the new position that needs to be checked
+     * @return true if the position is out of the safe zone
+     */
     private boolean isSafeZone(Coordinate newEnemyPosition) {
         return (newEnemyPosition.x()+newEnemyPosition.y() >3);
     }
@@ -688,7 +722,10 @@ public class MainModel extends Observable {
         this.level = level;
     }
 
-
+    /**
+     * This method adds the user to the leaderboard
+     * @param name the name of the player
+     */
     public void setPlayer(String name) {
         //using the returning Optional value of the stream to check if the player is already present in the leaderboard
         Optional<User> existingUser = leaderboard.stream()
@@ -709,7 +746,10 @@ public class MainModel extends Observable {
         }
     }
 
-    private void load(){
+    /**
+     * This method loads the leaderboard from its file
+     */
+    private void loadLeaderboardFromFile(){
         String filePath = getFilePath();
 
         try {
@@ -730,6 +770,9 @@ public class MainModel extends Observable {
         }
     }
 
+    /**
+     * This method saves the leaderboard in its file with the new data
+     */
     public void save(){
         Gson gson = new Gson();
         String jsonString = gson.toJson(leaderboard);
