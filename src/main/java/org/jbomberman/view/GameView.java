@@ -371,23 +371,23 @@ public class GameView implements Observer {
                     switch (updateInfo.getSubBlock()) {
                         case GROUND_BLOCKS -> {
                             if (level == 1)
-                                loader(updateInfo.getArray(), BlockImage.GRASS.getImage());
+                                loader(updateInfo.getBlocks(), BlockImage.GRASS.getImage());
                             else
-                                loader(updateInfo.getArray(), BlockImage.GRASS2.getImage());
+                                loader(updateInfo.getBlocks(), BlockImage.GRASS2.getImage());
                         }
 
                         case STATIC_BLOCKS -> {
                             if (level == 1)
-                                loader(updateInfo.getArray(), BlockImage.BEDROCK.getImage());
+                                loader(updateInfo.getBlocks(), BlockImage.BEDROCK.getImage());
                             else
-                                loader(updateInfo.getArray(), BlockImage.BEDROCK2.getImage());
+                                loader(updateInfo.getBlocks(), BlockImage.BEDROCK2.getImage());
                         }
 
                         case RANDOM_BLOCKS -> {
                             if (level == 1)
-                                updateInfo.getArray().forEach(coordinate -> drawImageView(coordinate, BlockImage.STONE.getImage(), randomBlocks));
+                                updateInfo.getBlocks().forEach(coordinate -> drawImageView(coordinate, BlockImage.STONE.getImage(), randomBlocks));
                             else
-                                updateInfo.getArray().forEach(coordinate -> drawImageView(coordinate, BlockImage.STONE2.getImage(), randomBlocks));
+                                updateInfo.getBlocks().forEach(coordinate -> drawImageView(coordinate, BlockImage.STONE2.getImage(), randomBlocks));
                         }
                         default -> throw new IllegalStateException("Unexpected value: " + updateInfo.getIndex());
                     }
@@ -399,9 +399,9 @@ public class GameView implements Observer {
 
                 case LOAD_LIFE -> livesLabel.setText("Lives: " + updateInfo.getIndex());
 
-                case LOAD_ENEMIES -> updateInfo.getArray().forEach(coordinate -> drawImageView(coordinate, BlockImage.ENEMY_DOWN.getImage(), enemies));
+                case LOAD_ENEMIES -> updateInfo.getEntities().forEach(coordinate -> drawImageView(coordinate, BlockImage.ENEMY_DOWN.getImage(), enemies));
 
-                case LOAD_COINS -> updateInfo.getArray().forEach(coordinate -> drawImageView(coordinate, BlockImage.COIN.getImage(), coins));
+                case LOAD_COINS -> updateInfo.getEntities().forEach(coordinate -> drawImageView(coordinate, BlockImage.COIN.getImage(), coins));
 
 
                 case LOAD_PLAYER -> player = loadItems(updateInfo.getCoordinate(), BlockImage.BOMBERMAN.getImage());
@@ -432,26 +432,26 @@ public class GameView implements Observer {
                     runOpeningDoorAnimation();
                 }
 
-                case UPDATE_POSITION -> position(updateInfo.getNewCoord(), updateInfo.getOldCoord(), updateInfo.getIndex(), updateInfo.getKeyCode(), updateInfo.getBoo());
+                case UPDATE_POSITION -> position(updateInfo.getNewCoord(), updateInfo.getOldCoord(), updateInfo.getIndex(), updateInfo.getKeyCode(), updateInfo.isEnemyLastLife());
 
                 case UPDATE_RESPAWN -> respawn(updateInfo.getIndex());
 
 
-                case UPDATE_POINTS -> updatePoints(updateInfo.getIndex(), updateInfo.getIndex2(), updateInfo.getCoordinate());
+                case UPDATE_POINTS -> updatePoints(updateInfo.getPoints(), updateInfo.getEarnedPoints(), updateInfo.getCoordinate());
 
                 case UPDATE_PU_LIFE -> doLifePowerUp(updateInfo.getIndex());
 
 
                 case UPDATE_PU_BOMB -> doBombPowerUp();
 
-                case UPDATE_PU_INVINCIBLE -> doInvinciblePowerUp(updateInfo.getBoo());
+                case UPDATE_PU_INVINCIBLE -> doInvinciblePowerUp(updateInfo.isInvincible());
 
                 case UPDATE_BOMB_RELEASED -> {
                     BackgroundMusic.playBomb();
                     drawBomb(updateInfo.getCoordinate());
                 }
 
-                case UPDATE_EXPLOSION -> playExplosionAnimation(updateInfo.getTriadArrayList());
+                case UPDATE_EXPLOSION -> playExplosionAnimation(updateInfo.getTriadList());
 
                 case UPDATE_ENEMY_LIFE -> {
                     ImageView woundedEnemy = enemies.get(updateInfo.getIndex());
@@ -690,12 +690,12 @@ public class GameView implements Observer {
         pauseTransition.play();
     }
 
-    private void playExplosionAnimation(ArrayList<Triad> triadArrayList) {
+    private void playExplosionAnimation(List<Triad> triadArrayList) {
         removeBomb();
         playExplosionAnimation(triadArrayList, 1);
     }
 
-    private void playExplosionAnimation(ArrayList<Triad> triadArrayList, int i) {
+    private void playExplosionAnimation(List<Triad> triadArrayList, int i) {
         String path = "explosion/" + i;
         triadArrayList.forEach(triad -> {
             ImageView imageView;
@@ -723,7 +723,7 @@ public class GameView implements Observer {
         bombExplosion.forEach(imageView -> gameBoard.getChildren().remove(imageView));
     }
 
-    private void loader(ArrayList<Coordinate> array, Image image) {
+    private void loader(List<Coordinate> array, Image image) {
         array.forEach(coordinate -> gameBoard.getChildren().add(createImageView(coordinate, image)));
     }
 }
