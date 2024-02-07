@@ -7,6 +7,7 @@ import org.jbomberman.utils.*;
 import javafx.scene.input.KeyCode;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -679,7 +680,7 @@ public class MainModel extends Observable {
         );
     }
 
-    public ArrayList<User> getLeaderboard(){
+    public List<User> getLeaderboard(){
         return leaderboard;
     }
 
@@ -709,7 +710,7 @@ public class MainModel extends Observable {
     }
 
     private void load(){
-        String filePath = "src/main/java/org/jbomberman/model/output.json";
+        String filePath = getFilePath();
 
         try {
             FileReader fileReader = new FileReader(filePath);
@@ -735,7 +736,8 @@ public class MainModel extends Observable {
 
         System.out.println(jsonString);
 
-        String filePath = "src/main/java/org/jbomberman/model/output.json";
+        String filePath = getFilePath();
+
         try {
             FileWriter fileWriter = new FileWriter(filePath);
 
@@ -748,6 +750,12 @@ public class MainModel extends Observable {
             System.out.println("Si è verificato un errore durante il salvataggio del file: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private static String getFilePath() {
+        String homeDir = System.getProperty("user.home");
+        String separator = File.separator;
+        return homeDir + separator+ "leaderboard.json";
     }
     //###############################################//
 }

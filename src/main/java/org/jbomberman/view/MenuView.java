@@ -33,13 +33,13 @@ public class MenuView implements Observer{
 
     private void buttons() {
         Color color = Color.WHITE;
-        mainMenu = SceneManager.createPane("JBomberMan", false, true);
+        mainMenu = ViewUtilities.createPane("JBomberMan", false, true);
         mainMenu.setVisible(true);
 
-        Label mainMenuPlayButton = SceneManager.getButton("play", 0, color);
+        Label mainMenuPlayButton = ViewUtilities.getButton("play", 0, color);
 
-        Label mainMenuLeaderboardButton = SceneManager.getButton("leaderboard", 1, color);
-        Label mainMenuExitButton = SceneManager.getButton("quit", 2, color);
+        Label mainMenuLeaderboardButton = ViewUtilities.getButton("leaderboard", 1, color);
+        Label mainMenuExitButton = ViewUtilities.getButton("quit", 2, color);
 
         mainMenuPlayButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
@@ -50,7 +50,7 @@ public class MenuView implements Observer{
             BackgroundMusic.playClick();
             leader.updateScrollPane();
             leaderboard = leader.getLeaderboardPane();
-            SceneManager.changePane(mainMenu, leaderboard);
+            ViewUtilities.changePane(mainMenu, leaderboard);
         });
         mainMenuExitButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
@@ -63,11 +63,11 @@ public class MenuView implements Observer{
 
         leaderboard.setVisible(false);
 
-        Label leaderboardBackButton = SceneManager.getButton("back", 4, Color.WHITE);
+        Label leaderboardBackButton = ViewUtilities.getButton("back", 4, Color.WHITE);
 
         leaderboardBackButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            SceneManager.changePane(leaderboard, mainMenu);
+            ViewUtilities.changePane(leaderboard, mainMenu);
         });
 
         leaderboard.getChildren().add(leaderboardBackButton);

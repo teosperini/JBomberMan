@@ -12,12 +12,12 @@ import javafx.scene.text.Text;
 import org.jbomberman.controller.MainController;
 import org.jbomberman.utils.Coordinate;
 
-public class SceneManager {
+public class ViewUtilities {
 
     public static final int SCALE_FACTOR = 35;
     public static final int WIDTH = SCALE_FACTOR* MainController.DX;
     public static final int HEIGHT = SCALE_FACTOR*MainController.DY;
-    public static final Font CUSTOM_FONT_SMALL = Font.loadFont(SceneManager.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR-5);
+    public static final Font CUSTOM_FONT_SMALL = Font.loadFont(ViewUtilities.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR-5);
     public static final int MAX_NAME_LETTERS = 8;
 
 
@@ -49,11 +49,11 @@ public class SceneManager {
         }
 
         if (main) {
-            customFont = Font.loadFont(SceneManager.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR + 15);
+            customFont = Font.loadFont(ViewUtilities.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR + 15);
             text.setFont(customFont);
             text.setStyle("-fx-fill: darkcyan");
         } else {
-            customFont = Font.loadFont(SceneManager.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR + 5);
+            customFont = Font.loadFont(ViewUtilities.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR + 5);
             text.setFont(customFont);
             text.setStyle("-fx-fill: white");
         }
@@ -68,7 +68,7 @@ public class SceneManager {
 
     private static Pane getPaneImage(boolean opacity) {
         //l'immagine la carico comunque, ma differenzio tra menu e gioco perchè nel gioco l'immagine la rendo invisibile
-        ImageView imageView = new ImageView(new Image(SceneManager.class.getResourceAsStream("/org/jbomberman/sfondo_small.jpg")));
+        ImageView imageView = new ImageView(new Image(ViewUtilities.class.getResourceAsStream("/org/jbomberman/sfondo_small.jpg")));
         imageView.setFitHeight(HEIGHT);
         imageView.setFitWidth(WIDTH);
         if (opacity) imageView.setOpacity(0);
@@ -135,8 +135,8 @@ public class SceneManager {
             double textWidth = node.getLayoutBounds().getWidth();
             double textHeight = node.getLayoutBounds().getHeight();
 
-            double centerX = (double) SceneManager.WIDTH / 2;
-            double centerY = (double) SceneManager.HEIGHT / 2;
+            double centerX = (double) ViewUtilities.WIDTH / 2;
+            double centerY = (double) ViewUtilities.HEIGHT / 2;
             node.setLayoutX(centerX - textWidth / 2);
             node.setLayoutY(centerY - textHeight / 2);
         });

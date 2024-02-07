@@ -16,7 +16,7 @@ import javafx.util.Duration;
 
 import java.util.*;
 
-import static org.jbomberman.view.SceneManager.*;
+import static org.jbomberman.view.ViewUtilities.*;
 
 public class GameView implements Observer {
 
@@ -61,6 +61,7 @@ public class GameView implements Observer {
     private int level;
     private String nickname;
 
+    private ImageView selectedImage;
     //IMAGES
     private enum BlockImage {
         //bomb is the real bomb, fire is the power_up
@@ -107,10 +108,11 @@ public class GameView implements Observer {
         coins = new ArrayList<>();
         bombExplosion = new ArrayList<>();
         addBottomBar();
-        genInGamePanels();
+        createGamePanels();
+        initializeKeyPressed();
     }
 
-    public void initialize() {
+    public void initializeKeyPressed() {
         // The event handler for the pressed keys
         gameBoard.setOnKeyPressed(controller::handleGameKeyEvent);
     }
@@ -126,16 +128,16 @@ public class GameView implements Observer {
      * - The gameVictory Pane
      * and all of their buttons (except for the buttons of gameVictory, those are chosen at runtime)
      */
-    private void genInGamePanels() {
+    private void createGamePanels() {
         //################# PAUSE ################//
         // Initializing the pause Pane
-        pause = SceneManager.createPane("Pause", true, false);
+        pause = ViewUtilities.createPane("Pause", true, false);
         pause.setVisible(false);
 
         // Declaring and initializing the pause buttons
-        Label pauseResumeButton = SceneManager.getButton("resume", 0, Color.WHITE);
-        Label pauseOptionsButton = SceneManager.getButton("options", 1, Color.WHITE);
-        Label pauseExitButton = SceneManager.getButton("menu", 2, Color.WHITE);
+        Label pauseResumeButton = ViewUtilities.getButton("resume", 0, Color.WHITE);
+        Label pauseOptionsButton = ViewUtilities.getButton("options", 1, Color.WHITE);
+        Label pauseExitButton = ViewUtilities.getButton("menu", 2, Color.WHITE);
 
         // Mouse events handling
         pauseResumeButton.setOnMouseClicked(mouseEvent -> {
@@ -144,11 +146,11 @@ public class GameView implements Observer {
         });
         pauseOptionsButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            SceneManager.changePane(pause,options);
+            ViewUtilities.changePane(pause,options);
         });
         pauseExitButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            SceneManager.changePane(pause, gameContinue);
+            ViewUtilities.changePane(pause, gameContinue);
         });
 
         // Keyboard events handling
@@ -164,12 +166,12 @@ public class GameView implements Observer {
 
         //################# OPTIONS ################//
         // Initializing the options pane
-        options = SceneManager.createPane("Options", true, false);
+        options = ViewUtilities.createPane("Options", true, false);
         options.setVisible(false);
 
         // Declaring and initializing the options buttons
-        Label optionsStopMusicButton = SceneManager.getButton("stop/resume music", 1, Color.WHITE);
-        Label optionsBackButton = SceneManager.getButton("back", 2, Color.WHITE);
+        Label optionsStopMusicButton = ViewUtilities.getButton("stop/resume music", 1, Color.WHITE);
+        Label optionsBackButton = ViewUtilities.getButton("back", 2, Color.WHITE);
 
         // Mouse events handling
         optionsStopMusicButton.setOnMouseClicked(mouseEvent -> {
@@ -179,17 +181,17 @@ public class GameView implements Observer {
             } else {
                 controller.playMusic();
             }
-            SceneManager.changePane(options, pause);
+            ViewUtilities.changePane(options, pause);
         });
         optionsBackButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            SceneManager.changePane(options, pause);
+            ViewUtilities.changePane(options, pause);
         });
 
         // Keyboard events handling
         options.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
-                SceneManager.changePane(options,pause);
+                ViewUtilities.changePane(options,pause);
                 keyEvent.consume();
             }
         });
@@ -198,7 +200,7 @@ public class GameView implements Observer {
 
         //################# GAME CONTINUE ################//
         // Initializing the gameContinue pane
-        gameContinue = SceneManager.createPane("Save your results", true,false);
+        gameContinue = ViewUtilities.createPane("Save your results", true,false);
         gameContinue.setVisible(false);
 
         // Initializing the textField of the gameContinue, where the user will be able to write his name
@@ -228,15 +230,17 @@ public class GameView implements Observer {
             }
 
         textField.setOnKeyPressed(keyEvent -> {
+                // Creating the
                 ImageView imageView = new ImageView(new Image(Objects.requireNonNull(GameView.class.getResourceAsStream("definitive/ok.png"))));
                 imageView.setLayoutX(textField.getLayoutX()-SCALE_FACTOR-5);
-                imageView.setLayoutY((double) SceneManager.HEIGHT / 2 - (double) SCALE_FACTOR /2);
+                imageView.setLayoutY((double) ViewUtilities.HEIGHT / 2 - (double) SCALE_FACTOR /2);
                 imageView.setFitHeight(SCALE_FACTOR);
                 imageView.setFitWidth(SCALE_FACTOR);
+
                 if (keyEvent.getCode().equals(KeyCode.ENTER)){
                     nickname = textField.getText();
                     controller.newPlayer(nickname);
-                    textField.clear();
+                    textField.setStyle("-fx-text-fill: gray;");
                     gameContinue.requestFocus();
                     gameContinue.getChildren().add(imageView);
                     PauseTransition pauseTransition = new PauseTransition(Duration.millis(1000));
@@ -247,26 +251,26 @@ public class GameView implements Observer {
 
 
         //################## GAME OVER #################//
-        gameOver = SceneManager.createPane("Game Over", true,false);
+        gameOver = ViewUtilities.createPane("Game Over", true,false);
         gameOver.setVisible(false);
 
-        Label gameOverContinue = SceneManager.getButton("Continue", 2, Color.WHITE);
+        Label gameOverContinue = ViewUtilities.getButton("Continue", 2, Color.WHITE);
 
         gameOverContinue.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            SceneManager.changePane(gameOver, gameContinue);
+            ViewUtilities.changePane(gameOver, gameContinue);
         });
 
         deathPointsLabel = new Label();
 
         deathPointsLabel.setStyle("-fx-text-fill: white;");
-        deathPointsLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
+        deathPointsLabel.setFont(ViewUtilities.CUSTOM_FONT_SMALL);
 
         gameOver.getChildren().addAll(gameOverContinue, deathPointsLabel);
 
 
         //################## VICTORY ###################//
-        gameVictory = SceneManager.createPane("Victory", true, false);
+        gameVictory = ViewUtilities.createPane("Victory", true, false);
         gameVictory.setVisible(false);
 
 
@@ -282,17 +286,17 @@ public class GameView implements Observer {
         bottomBar.setLayoutX(0);
         bottomBar.setLayoutY((double)SCALE_FACTOR * (MainController.DY-1));
         bottomBar.setPrefHeight(SCALE_FACTOR);
-        bottomBar.setPrefWidth(SceneManager.WIDTH);
+        bottomBar.setPrefWidth(ViewUtilities.WIDTH);
         bottomBar.setStyle("-fx-background-color: grey");
 
         // Building the labels
         livesLabel = new Label();
         pointsLabel = new Label();
 
-        livesLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
+        livesLabel.setFont(ViewUtilities.CUSTOM_FONT_SMALL);
         livesLabel.setTextFill(Color.BLACK);
 
-        pointsLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
+        pointsLabel.setFont(ViewUtilities.CUSTOM_FONT_SMALL);
         pointsLabel.setTextFill(Color.BLACK);
 
 
@@ -326,7 +330,7 @@ public class GameView implements Observer {
         pointsLabel.setText(points);
         deathPointsLabel.setText(points);
 
-        Label text = SceneManager.getFloatingLabel(Integer.toString(currentPoints), coordinate);
+        Label text = ViewUtilities.getFloatingLabel(Integer.toString(currentPoints), coordinate);
         gameBoard.getChildren().add(text);
         text.setVisible(true);
         text.toFront();
@@ -501,11 +505,11 @@ public class GameView implements Observer {
     private void updateVictoryPane() {
         victoryPointsLabel = new Label();
         victoryPointsLabel.setStyle("-fx-text-fill: white;");
-        victoryPointsLabel.setFont(SceneManager.CUSTOM_FONT_SMALL);
+        victoryPointsLabel.setFont(ViewUtilities.CUSTOM_FONT_SMALL);
 
-        Label victoryNextLevelButton = SceneManager.getButton("nextLevel", 1, Color.WHITE);
-        Label victoryExitButton = SceneManager.getButton("menu", 2, Color.WHITE);
-        Label victoryContinueButton = SceneManager.getButton("Continue", 2, Color.WHITE);
+        Label victoryNextLevelButton = ViewUtilities.getButton("nextLevel", 1, Color.WHITE);
+        Label victoryExitButton = ViewUtilities.getButton("menu", 2, Color.WHITE);
+        Label victoryContinueButton = ViewUtilities.getButton("Continue", 2, Color.WHITE);
 
         victoryNextLevelButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
@@ -513,11 +517,11 @@ public class GameView implements Observer {
         });
         victoryExitButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            SceneManager.changePane(gameVictory, gameContinue);
+            ViewUtilities.changePane(gameVictory, gameContinue);
         });
         victoryContinueButton.setOnMouseClicked(mouseEvent ->{
             BackgroundMusic.playClick();
-            SceneManager.changePane(gameVictory, gameContinue);
+            ViewUtilities.changePane(gameVictory, gameContinue);
         });
 
         if (level == 1) {
@@ -600,7 +604,7 @@ public class GameView implements Observer {
     }
 
     public void resumeView() {
-        SceneManager.changePane(pause,gameBoard);
+        ViewUtilities.changePane(pause,gameBoard);
     }
 
 

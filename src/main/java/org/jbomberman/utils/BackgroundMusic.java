@@ -7,19 +7,19 @@ import javafx.scene.media.MediaPlayer;
 import java.util.Objects;
 
 public class BackgroundMusic {
-    private static final String MENUSOUNDTRACK = Objects.requireNonNull(BackgroundMusic.class.getResource("intro.mp3").toExternalForm());
-    private static final String GAMESOUNDTRACK = Objects.requireNonNull(BackgroundMusic.class.getResource("game.mp3")).toExternalForm();
-    private static final AudioClip GAMEBOMB = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("tnt_exp.mp3")).toExternalForm());
-    private static final AudioClip SUCCESS = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("success.mp3")).toExternalForm());
-    private static final AudioClip COIN = new AudioClip(BackgroundMusic.class.getResource("coin.mp3").toExternalForm());
-    private static final AudioClip LOST = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("lost.mp3")).toExternalForm());
-    private static final AudioClip DOOR = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("door.mp3").toExternalForm()));
-    private static final AudioClip ONE_UP = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("smb_1-up.wav").toExternalForm()));
-    private static final AudioClip BIG_BOMB = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("smb_powerup.wav").toExternalForm()));
-    private static final AudioClip CLICK = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("click.wav").toExternalForm()));
-    private static final AudioClip DEATH = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("death.mp3").toExternalForm()));
-    private static final AudioClip ENEMY_DEATH = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("enemy_death.mp3").toExternalForm()));
-    private static final AudioClip INVINCIBLE = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("Invincible.mp3").toExternalForm()));
+    private static final String MENUSOUNDTRACK = Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/intro.mp3").toExternalForm());
+    private static final String GAMESOUNDTRACK = Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/game.mp3")).toExternalForm();
+    private static final AudioClip GAMEBOMB = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/tnt_exp.mp3")).toExternalForm());
+    private static final AudioClip SUCCESS = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/success.mp3")).toExternalForm());
+    private static final AudioClip COIN = new AudioClip(BackgroundMusic.class.getResource("background_music/coin.mp3").toExternalForm());
+    private static final AudioClip LOST = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/lost.mp3")).toExternalForm());
+    private static final AudioClip DOOR = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/door.mp3").toExternalForm()));
+    private static final AudioClip ONE_UP = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/smb_1-up.wav").toExternalForm()));
+    private static final AudioClip BIG_BOMB = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/smb_powerup.wav").toExternalForm()));
+    private static final AudioClip CLICK = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/click.wav").toExternalForm()));
+    private static final AudioClip DEATH = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/death.mp3").toExternalForm()));
+    private static final AudioClip ENEMY_DEATH = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/enemy_death.mp3").toExternalForm()));
+    private static final AudioClip INVINCIBLE = new AudioClip(Objects.requireNonNull(BackgroundMusic.class.getResource("background_music/Invincible.mp3").toExternalForm()));
 
     private static MediaPlayer gameMediaPlayer;
     private static MediaPlayer menuMediaPlayer;

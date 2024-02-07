@@ -14,7 +14,7 @@ import java.util.List;
 public class LeaderboardView {
 
     private final MainController controller = MainController.getInstance();
-    private final Pane leaderboardPane = SceneManager.createPane("Leaderboard", false, false);
+    private final Pane leaderboardPane = ViewUtilities.createPane("Leaderboard", false, false);
     private final ScrollPane scrollPane = new ScrollPane();
     private final VBox contentPane = new VBox(2); //lo spazio tra le scritte
 
@@ -34,7 +34,7 @@ public class LeaderboardView {
         scrollPane.getStylesheets().add("org/jbomberman/view/scrollPane.css");
         scrollPane.setContent(contentPane);
 
-        SceneManager.setCentred(scrollPane);
+        ViewUtilities.setCentred(scrollPane);
     }
 
     public void updateScrollPane() {
@@ -47,13 +47,12 @@ public class LeaderboardView {
 
         leaderboard.forEach(user -> {
             String playerName = user.name();
-
             int nameLength = playerName.length();
-            int paddingLength = SceneManager.MAX_NAME_LETTERS - nameLength;
+            int paddingLength = ViewUtilities.MAX_NAME_LETTERS - nameLength;
             String username = playerName + " ".repeat(paddingLength);
 
             Label player = new Label(username + ": " + user.score() + " - " + user.level());
-            player.setFont(SceneManager.CUSTOM_FONT_SMALL);
+            player.setFont(ViewUtilities.CUSTOM_FONT_SMALL);
             player.setStyle("-fx-text-fill: white;");
             contentPane.getChildren().add(player);
         });

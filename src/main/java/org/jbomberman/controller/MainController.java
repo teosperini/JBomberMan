@@ -8,7 +8,7 @@ import javafx.util.Duration;
 import org.jbomberman.model.MainModel;
 import org.jbomberman.model.User;
 import org.jbomberman.utils.BackgroundMusic;
-import org.jbomberman.view.SceneManager;
+import org.jbomberman.view.ViewUtilities;
 import org.jbomberman.view.GameView;
 import org.jbomberman.view.MenuView;
 import javafx.scene.Parent;
@@ -65,7 +65,7 @@ public class MainController {
         model.addObserver(menuView);
 
         Parent root = menuView.getMenu();
-        scene = new Scene(root, SceneManager.WIDTH, SceneManager.HEIGHT);
+        scene = new Scene(root, ViewUtilities.WIDTH, ViewUtilities.HEIGHT);
         stage.setScene(scene);
         stage.show();
         BackgroundMusic.playMenuMusic();
@@ -172,11 +172,10 @@ public class MainController {
         model.addObserver(gameView);
         model.notifyModelReady();
 
-        gameView.initialize();
-
         if (!BackgroundMusic.isPlaying()) {
             BackgroundMusic.playGameMusic();
         } else {
+            // Let the music start from the beginning
             BackgroundMusic.stopGameMusic();
             BackgroundMusic.playGameMusic();
         }
