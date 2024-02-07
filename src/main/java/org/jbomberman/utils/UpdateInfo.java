@@ -18,16 +18,86 @@ public class UpdateInfo {
     private int index;
     private int points;
     private int earnedPoints;
-    private SubMap block;
+    private BlockType blockType;
     private int healthPoint;
     private int level;
 
-    // Costruttore privato per il Builder
+    /**
+     * The private constructor with the only mandatory attribute
+     * @param updateType
+     */
     private UpdateInfo(UpdateType updateType) {
         this.updateType = updateType;
     }
 
-    // Builder statico
+    //############ UpdateInfo GETTERS #############//
+    public UpdateType getUpdateType() {
+        return updateType;
+    }
+
+    public Coordinate getOldCoord() {
+        return oldPosition;
+    }
+
+    public Coordinate getNewCoord() {
+        return newPosition;
+    }
+
+    public Coordinate getCoordinate() {
+        return coordinate;
+    }
+
+    public List<Coordinate> getEntities() {
+        return entities;
+    }
+
+    public List<Coordinate> getBlocks() {
+        return blocks;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public int getLevel(){
+        return level;
+    }
+
+    public int getEarnedPoints() {
+        return earnedPoints;
+    }
+
+    public boolean isEnemyLastLife() {
+        return enemyLastLife;
+    }
+
+    public BlockType getSubBlock() {
+        return blockType;
+    }
+
+    public List<Triad> getTriadList() {
+        return triadList;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public int getHealthPoint(){
+        return healthPoint;
+    }
+
+    public KeyCode getKeyCode() {
+        return keyCode;
+    }
+
+    public boolean isInvincible() {
+        return isPlayerInvincible;
+    }
+
+    /**
+     * The Builder class to implement the builder pattern
+     */
     public static class Builder {
         private final UpdateType updateType;
         private KeyCode keyCode;
@@ -42,7 +112,7 @@ public class UpdateInfo {
         private int index;
         private int points;
         private int earnedPoints;
-        private SubMap block;
+        private BlockType blockType;
         private int healthPoint;
         private int level;
 
@@ -50,6 +120,7 @@ public class UpdateInfo {
             this.updateType = updateType;
         }
 
+        //############### BUILDER SETTER METHODS ##############//
         public Builder setKeyCode(KeyCode keyCode) {
             this.keyCode = keyCode;
             return this;
@@ -100,11 +171,12 @@ public class UpdateInfo {
             return this;
         }
 
-        public Builder setLevel(int level){
+        public Builder setLevel(int level) {
             this.level = level;
             return this;
         }
-        public Builder setHealthPoint(int healthPoint){
+
+        public Builder setHealthPoint(int healthPoint) {
             this.healthPoint = healthPoint;
             return this;
         }
@@ -119,11 +191,16 @@ public class UpdateInfo {
             return this;
         }
 
-        public Builder setSubBlock(SubMap block) {
-            this.block = block;
+        public Builder setSubBlock(BlockType block) {
+            this.blockType = block;
             return this;
         }
 
+        /**
+         * This method creates the UpdateInfo instance
+         *
+         * @return
+         */
         public UpdateInfo build() {
             UpdateInfo updateInfo = new UpdateInfo(updateType);
             updateInfo.keyCode = this.keyCode;
@@ -138,75 +215,10 @@ public class UpdateInfo {
             updateInfo.index = this.index;
             updateInfo.points = this.points;
             updateInfo.earnedPoints = this.earnedPoints;
-            updateInfo.block = this.block;
+            updateInfo.blockType = this.blockType;
             updateInfo.healthPoint = this.healthPoint;
             updateInfo.level = this.level;
             return updateInfo;
         }
-    }
-
-    // Metodi getter
-    public UpdateType getUpdateType() {
-        return updateType;
-    }
-
-    public Coordinate getOldCoord() {
-        return oldPosition;
-    }
-
-    public Coordinate getNewCoord() {
-        return newPosition;
-    }
-
-    public Coordinate getCoordinate() {
-        return coordinate;
-    }
-
-    public List<Coordinate> getEntities() {
-        return entities;
-    }
-
-    public List<Coordinate> getBlocks() {
-        return blocks;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public int getLevel(){
-        return level;
-    }
-
-    public int getEarnedPoints() {
-        return earnedPoints;
-    }
-
-    public boolean isEnemyLastLife() {
-        return enemyLastLife;
-    }
-
-    public SubMap getSubBlock() {
-        return block;
-    }
-
-    public List<Triad> getTriadList() {
-        return triadList;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public int getHealthPoint(){
-        return healthPoint;
-    }
-
-    public KeyCode getKeyCode() {
-        return keyCode;
-    }
-
-    public boolean isInvincible() {
-        return isPlayerInvincible;
     }
 }

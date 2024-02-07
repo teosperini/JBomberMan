@@ -522,9 +522,9 @@ public class MainModel extends Observable {
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.LEVEL).setLevel(level).build());
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(SubMap.GROUND_BLOCKS).setBlocks(coordinateGround).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(BlockType.GROUND_BLOCKS).setBlocks(coordinateGround).build());
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(SubMap.STATIC_BLOCKS).setBlocks(coordinatesFixedBlocks).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(BlockType.STATIC_BLOCKS).setBlocks(coordinatesFixedBlocks).build());
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_POWER_UP_BOMB).setCoordinate(bombPu).build());
         setChanged();
@@ -536,7 +536,7 @@ public class MainModel extends Observable {
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_COINS).setEntities(coins).build());
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(SubMap.RANDOM_BLOCKS).setBlocks(coordinatesRandomBlocks).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(BlockType.RANDOM_BLOCKS).setBlocks(coordinatesRandomBlocks).build());
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_PLAYER).setCoordinate(playerPosition).build());
         setChanged();

@@ -547,10 +547,10 @@ public class GameView implements Observer {
         }
 
         if (entity < 0) {
-            controller.moving(true);
+            controller.setMoving(true);
             transition.setDuration(Duration.millis(200));
             transition.setOnFinished(event ->
-                    controller.moving(false)
+                    controller.setMoving(false)
             );
             transition.setNode(player);
         } else {
@@ -577,7 +577,7 @@ public class GameView implements Observer {
 
     private void respawn(int index) {
         BackgroundMusic.playDeath();
-        controller.moving(true);
+        controller.setMoving(true);
         controller.setPause(false);
         PauseTransition pauseRespawn = getPauseRespawn();
         updateLife(index);
@@ -589,7 +589,7 @@ public class GameView implements Observer {
         pauseRespawn.setOnFinished(event -> {
             player.setTranslateX(0);
             player.setTranslateY(0);
-            controller.moving(false);
+            controller.setMoving(false);
             controller.setPause(false);
         });
         return pauseRespawn;

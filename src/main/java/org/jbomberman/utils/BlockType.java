@@ -1,6 +1,6 @@
 package org.jbomberman.utils;
 
-public enum SubMap {
+public enum BlockType {
     GROUND_BLOCKS,
     STATIC_BLOCKS,
     RANDOM_BLOCKS;

@@ -30,7 +30,7 @@ public class BackgroundMusic {
     public static void playGameMusic(){
         Media media = new Media(GAMESOUNDTRACK);
         gameMediaPlayer =  new MediaPlayer(media);
-        gameMediaPlayer.setCycleCount(MediaPlayer.INDEFINITE); // Riproduce la musica in modo continuo
+        gameMediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         gameMediaPlayer.play();
         isGamePlaying = true;
     }

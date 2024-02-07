@@ -19,22 +19,27 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-
+/**
+ * The MainController is responsible to handle the interaction of the user
+ * with the application being the intermediate between the view and the model
+ * The constructor is private due to the class implementing the Singleton pattern
+ */
 public class MainController {
+    // These two constants determinate the size of the game
     public static final int DX=17;
     public static final int DY=12;
+
     MenuView menuView;
     MainModel model;
     GameView gameView;
 
-
     Stage stage;
     Scene scene;
 
-    private Timeline mobMovement = new Timeline();
+    private Timeline mobMovement;
 
-    private boolean moving = false;
-    private boolean pause = false;
+    private boolean moving = false; // This is to avoid concurrent inputs from the player
+    private boolean pause = false; // This is to pause the entire game
 
     private static MainController instance;
 
@@ -52,12 +57,14 @@ public class MainController {
         this.stage = stage;
     }
 
-
+    /**
+     * This method creates the model and initialize the view of the menu adding the view as an
+     * observer for the model.
+     * Then it initialize the scene
+     */
     public void initialize(){
-        //creazione model
         model = new MainModel(DX, DY);
 
-        //creazione menu
         menuView = new MenuView();
         menuView.initialize();
 
@@ -67,28 +74,31 @@ public class MainController {
         scene = new Scene(root, ViewUtilities.WIDTH, ViewUtilities.HEIGHT);
         stage.setScene(scene);
         stage.show();
+
         BackgroundMusic.playMenuMusic();
     }
 
-    //################ NEW GAME ################//
 
-    public List<User> loadLeaderboard() {
-        return model.getLeaderboard();
-    }
-    //HANDLING OF THE KEY-EVENTS IN GAME
+    //################# KEYS AND GAME METHODS ##############//
 
+    /**
+     * This method is responsible to handle keyboard events in the game
+     * It performs different actions based on the key pressed:
+     * - movePlayer, that tells the model to try to move the player in the keyCode direction
+     * - releaseBomb and explodeBomb, that respectively release the bomb and explode the bomb
+     *    when the timer ends
+     * @param keyEvent The KeyEvent representing the key pressed by the user
+     */
     public void handleGameKeyEvent(KeyEvent keyEvent) {
         KeyCode keyCode = keyEvent.getCode();
-        //il tasto tab fa perdere il focus alla gameBoard, quindi l'ho escluso
+
         if (keyEvent.getCode() == KeyCode.TAB) {
             keyEvent.consume();
         } else if (keyCode == KeyCode.ESCAPE){
             pauseController();
         } else if (!pause && !moving){
             if (keyCode == KeyCode.SPACE) {
-                // if space is pressed we try to release a bomb
                 if (model.releaseBomb()) {
-                    // start a timer that at the end explode the bomb
                     PauseTransition bombTimer = new PauseTransition(Duration.millis(1750));
                     bombTimer.setOnFinished(actionEvent -> model.explodeBomb());
                     bombTimer.play();
@@ -99,18 +109,26 @@ public class MainController {
         }
 
     }
+
+    /**
+     * This method pause the entire game
+     */
     public void pauseController() {
         pause = true;
         gameView.pauseView();
         mobMovement.pause();
     }
+
+    /**
+     * This method resume the entire game
+     */
     public void resumeController() {
         pause = false;
         gameView.resumeView();
         mobMovement.play();
     }
 
-    public void moving(boolean bool) {
+    public void setMoving(boolean bool) {
         moving = bool;
     }
 
@@ -118,7 +136,9 @@ public class MainController {
         this.pause = pause;
     }
 
-
+    /**
+     * This is the timeline that controls the movement of the enemies
+     */
     private void setTimeline(){
         mobMovement = new Timeline(
                 new KeyFrame(Duration.seconds(1), event ->{
@@ -132,7 +152,51 @@ public class MainController {
     }
 
 
-    // Irreversibly stops the game, preparing it for the after-game Panes
+    //############# LEVEL METHODS ##############//
+
+    /**
+     * This method is called when the user presses the Play button, initializing the model,
+     * the view of the game, and starting the timeline responsible to move the enemies
+     */
+    public void playButtonPressed() {
+        if (BackgroundMusic.isMenuPlaying()) {
+            BackgroundMusic.stopMenuMusic();
+        }
+        model.initialize();
+        model.deleteObservers();
+
+        gameView = new GameView();
+
+        model.addObserver(gameView);
+        model.notifyModelReady();
+
+        if (!BackgroundMusic.isPlaying()) {
+            BackgroundMusic.playGameMusic();
+        } else {
+            BackgroundMusic.stopGameMusic();
+            BackgroundMusic.playGameMusic();
+        }
+
+        scene.setRoot(gameView.getGame());
+        gameView.getFocus();
+
+        pause = false;
+        moving = false;
+        setTimeline();
+    }
+
+    /**
+     * It is called when the player choose to go to the next level
+     */
+    public void nextLevel() {
+        model.reset();
+        model.nextLevel();
+        playButtonPressed();
+    }
+
+    /**
+     * Irreversibly stops the game, preparing it for the after-game Panes
+     */
     public void endMatch(){
         if (BackgroundMusic.isPlaying()) {
             BackgroundMusic.stopGameMusic();
@@ -141,7 +205,9 @@ public class MainController {
         pause = true;
     }
 
-    // Returns to the main menu, resetting the model
+    /**
+     * Returns to the main menu, resetting the model
+     */
     public void quitMatch() {
         if (BackgroundMusic.isPlaying()) {
             BackgroundMusic.stopGameMusic();
@@ -157,45 +223,19 @@ public class MainController {
         model.reset();
         model.resetGame();
     }
-    public void playButtonPressed() {
-        if (BackgroundMusic.isMenuPlaying()) {
-            BackgroundMusic.stopMenuMusic();
-        }
-        model.initialize();
-        model.deleteObservers();
 
-        gameView = new GameView();
+    //############## LEADERBOARD ###############//
 
-        // Adding the view as an observer
-        model.addObserver(gameView);
-        model.notifyModelReady();
-
-        if (!BackgroundMusic.isPlaying()) {
-            BackgroundMusic.playGameMusic();
-        } else {
-            // Let the music start from the beginning
-            BackgroundMusic.stopGameMusic();
-            BackgroundMusic.playGameMusic();
-        }
-
-        //setting the scene
-        scene.setRoot(gameView.getGame());
-        gameView.getFocus();
-
-        //setting the controller
-        pause = false;
-        moving = false;
-        setTimeline();
-    }
-
-    public void nextLevel(){
-        model.reset();
-        model.nextLevel();
-        playButtonPressed();
-    }
-
+    /**
+     * This method is called when the player insert his name in the text field
+     * @param player is the name of the player
+     */
     public void newPlayer(String player){
         model.setPlayer(player);
+    }
+
+    public List<User> loadLeaderboard() {
+        return model.getLeaderboard();
     }
 
     public void stopMusic(){
@@ -208,7 +248,6 @@ public class MainController {
     //############## CLOSE THE WINDOW #############//
 
     public void gameExit() {
-
         stage.close();
     }
     //##################### TEST ####################//

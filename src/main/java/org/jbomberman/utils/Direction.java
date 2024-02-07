@@ -19,15 +19,5 @@ public enum Direction {
     public KeyCode getKeyCode() {
         return keyCode;
     }
-
-
-    public static Direction fromKeyCode(KeyCode keyCode) {
-        for (Direction direction : values()) {
-            if (direction.getKeyCode() == keyCode) {
-                return direction;
-            }
-        }
-        return null;
-    }
 }
 
