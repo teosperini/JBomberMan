@@ -56,7 +56,6 @@ public class MainController {
     public void initialize(){
         //creazione model
         model = new MainModel(DX, DY);
-        model.setLevel(1);
 
         //creazione menu
         menuView = new MenuView();
@@ -156,7 +155,6 @@ public class MainController {
 
 
         model.reset();
-        model.setLevel(1);
         model.resetGame();
     }
     public void playButtonPressed() {
@@ -192,7 +190,7 @@ public class MainController {
 
     public void nextLevel(){
         model.reset();
-        model.setLevel(2);
+        model.nextLevel();
         playButtonPressed();
     }
 

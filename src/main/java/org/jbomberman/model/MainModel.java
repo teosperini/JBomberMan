@@ -114,6 +114,7 @@ public class MainModel extends Observable {
         yMax = dy-2-1;
         playerHealthPoint = 3;
         points = 0;
+        level = 1;
         loadLeaderboardFromFile();
     }
 
@@ -167,7 +168,13 @@ public class MainModel extends Observable {
     public void resetGame(){
         playerHealthPoint = 3;
         points = 0;
+        level = 1;
     }
+
+    public void nextLevel() {
+        level++;
+    }
+
 
     private void generateBlocks() {
         generateBackground();
@@ -719,12 +726,9 @@ public class MainModel extends Observable {
         );
     }
 
+    //################# LEADERBOARD HANDLING #################//
     public List<User> getLeaderboard(){
         return leaderboard;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
     }
 
     /**
