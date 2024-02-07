@@ -365,7 +365,7 @@ public class GameView implements Observer {
             UpdateType updateType = updateInfo.getUpdateType();
 
             switch (updateType) {
-                case LEVEL -> level = updateInfo.getIndex();
+                case LEVEL -> level = updateInfo.getLevel();
 
                 case LOAD_MAP -> {
                     switch (updateInfo.getSubBlock()) {
@@ -397,7 +397,7 @@ public class GameView implements Observer {
                     deathPointsLabel.setText("Points: "+updateInfo.getIndex());
                 }
 
-                case LOAD_LIFE -> livesLabel.setText("Lives: " + updateInfo.getIndex());
+                case LOAD_LIFE -> livesLabel.setText("Lives: " + updateInfo.getHealthPoint());
 
                 case LOAD_ENEMIES -> updateInfo.getEntities().forEach(coordinate -> drawImageView(coordinate, BlockImage.ENEMY_DOWN.getImage(), enemies));
 
@@ -434,12 +434,12 @@ public class GameView implements Observer {
 
                 case UPDATE_POSITION -> position(updateInfo.getNewCoord(), updateInfo.getOldCoord(), updateInfo.getIndex(), updateInfo.getKeyCode(), updateInfo.isEnemyLastLife());
 
-                case UPDATE_RESPAWN -> respawn(updateInfo.getIndex());
+                case UPDATE_RESPAWN -> respawn(updateInfo.getHealthPoint());
 
 
                 case UPDATE_POINTS -> updatePoints(updateInfo.getPoints(), updateInfo.getEarnedPoints(), updateInfo.getCoordinate());
 
-                case UPDATE_PU_LIFE -> doLifePowerUp(updateInfo.getIndex());
+                case UPDATE_PU_LIFE -> doLifePowerUp(updateInfo.getHealthPoint());
 
 
                 case UPDATE_PU_BOMB -> doBombPowerUp();

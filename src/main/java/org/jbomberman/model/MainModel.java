@@ -73,7 +73,7 @@ public class MainModel extends Observable {
     private Coordinate tntCoordinates;
 
     // The number of lives of the player
-    private int playerHp;
+    private int playerHealthPoint;
 
     // The currents amount of points of the player
     private int points;
@@ -101,7 +101,7 @@ public class MainModel extends Observable {
     public MainModel(int dx, int dy) {
         xMax = dx-2;
         yMax = dy-2-1;
-        playerHp = 3;
+        playerHealthPoint = 3;
         points = 0;
         load();
     }
@@ -141,7 +141,7 @@ public class MainModel extends Observable {
     }
 
     public void resetGame(){
-        playerHp = 3;
+        playerHealthPoint = 3;
         points = 0;
     }
 
@@ -368,9 +368,9 @@ public class MainModel extends Observable {
 //####################################  POWER UPS AND LIFE  ####################################//
 
     private void lessLife() {
-        if (!playerInvincible) {
-            playerHp -= 1;
-            if (playerHp <= 0) {
+        if (!playerInvincible && playerHealthPoint > 0) {
+            playerHealthPoint -= 1;
+            if (playerHealthPoint <= 0) {
                 notifyDefeat();
             } else {
                 playerPosition = new Coordinate(1, 1);
@@ -480,9 +480,9 @@ public class MainModel extends Observable {
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_POINTS).setPoints(points).build());
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_LIFE).setIndex(playerHp).build()); //TODO
+        notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_LIFE).setHealthPoint(playerHealthPoint).build());
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.LEVEL).setIndex(level).build()); //TODO
+        notifyObservers(new UpdateInfo.Builder(UpdateType.LEVEL).setLevel(level).build());
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.LOAD_MAP).setSubBlock(SubMap.GROUND_BLOCKS).setBlocks(coordinateGround).build());
         setChanged();
@@ -582,7 +582,7 @@ public class MainModel extends Observable {
 
     private void notifyLessLife() {
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_RESPAWN).setIndex(playerHp).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_RESPAWN).setHealthPoint(playerHealthPoint).build());
     }
 
     private void notifyExplosion(ArrayList<Triad> triadArrayList) {
@@ -598,10 +598,10 @@ public class MainModel extends Observable {
     }
 
     public void notifyPULife(){
-        playerHp += 1;
+        playerHealthPoint += 1;
         lifePu = null;
         setChanged();
-        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_PU_LIFE).setIndex(playerHp).build());
+        notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_PU_LIFE).setHealthPoint(playerHealthPoint).build());
     }
 
     public void notifyPUInvincible(){

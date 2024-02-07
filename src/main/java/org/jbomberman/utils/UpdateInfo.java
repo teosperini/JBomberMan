@@ -19,6 +19,8 @@ public class UpdateInfo {
     private int points;
     private int earnedPoints;
     private SubMap block;
+    private int healthPoint;
+    private int level;
 
     // Costruttore privato per il Builder
     private UpdateInfo(UpdateType updateType) {
@@ -41,6 +43,8 @@ public class UpdateInfo {
         private int points;
         private int earnedPoints;
         private SubMap block;
+        private int healthPoint;
+        private int level;
 
         public Builder(UpdateType updateType) {
             this.updateType = updateType;
@@ -96,6 +100,15 @@ public class UpdateInfo {
             return this;
         }
 
+        public Builder setLevel(int level){
+            this.level = level;
+            return this;
+        }
+        public Builder setHealthPoint(int healthPoint){
+            this.healthPoint = healthPoint;
+            return this;
+        }
+
         public Builder setPoints(int points) {
             this.points = points;
             return this;
@@ -126,6 +139,8 @@ public class UpdateInfo {
             updateInfo.points = this.points;
             updateInfo.earnedPoints = this.earnedPoints;
             updateInfo.block = this.block;
+            updateInfo.healthPoint = this.healthPoint;
+            updateInfo.level = this.level;
             return updateInfo;
         }
     }
@@ -159,6 +174,10 @@ public class UpdateInfo {
         return index;
     }
 
+    public int getLevel(){
+        return level;
+    }
+
     public int getEarnedPoints() {
         return earnedPoints;
     }
@@ -177,6 +196,10 @@ public class UpdateInfo {
 
     public int getPoints() {
         return points;
+    }
+
+    public int getHealthPoint(){
+        return healthPoint;
     }
 
     public KeyCode getKeyCode() {
