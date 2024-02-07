@@ -23,6 +23,7 @@ import java.util.List;
  * The MainController is responsible to handle the interaction of the user
  * with the application being the intermediate between the view and the model
  * The constructor is private due to the class implementing the Singleton pattern
+ * It is the Controller of the MVC pattern
  */
 public class MainController {
     // These two constants determinate the size of the game

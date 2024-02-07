@@ -71,7 +71,7 @@ public class UpdateInfo {
         return enemyLastLife;
     }
 
-    public BlockType getSubBlock() {
+    public BlockType getBlockType() {
         return blockType;
     }
 

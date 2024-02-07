@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * The MainModel is the class that maintains the status of the game and that
  * implements all the game logics.
- * It is the Model of the MVC Pattern and is the Observable of the Observer/Observable pattern
+ * It is the Model of the MVC pattern and is the Observable in the Observer/Observable pattern
  * responsible to notify the View of its status changes.
  */
 public class MainModel extends Observable {
