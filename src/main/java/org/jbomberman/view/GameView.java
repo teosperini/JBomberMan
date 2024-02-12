@@ -420,7 +420,7 @@ public class GameView implements Observer {
 
                 case LOAD_POWER_UP_INVINCIBLE -> puInvincible = drawItems(updateInfo.getCoordinate(), BlockImage.INVINCIBLE.getImage());
 
-                case UPDATE_BLOCK_DESTROYED -> runBlockDestructionAnimation(removeImageView(randomBlocks, updateInfo.getIndex()));
+                case UPDATE_BLOCK_DESTROYED -> runBlockDestructionAnimation(randomBlocks.get(updateInfo.getIndex()));
 
                 case UPDATE_ENEMY_DEAD -> {
                     removeImageView(enemies, updateInfo.getIndex());
@@ -634,7 +634,12 @@ public class GameView implements Observer {
         PauseTransition pauseTransition = new PauseTransition(Duration.millis(160));
         pauseTransition.setOnFinished(event -> {
             if (index < end) runAnimation(imageView, index + 1, end, path);
+            else if(randomBlocks.contains(imageView)){
+                randomBlocks.remove(imageView);
+                gameBoard.getChildren().remove(imageView);
+            }
         });
+        System.out.println("rimozione");
         pauseTransition.play();
     }
 
