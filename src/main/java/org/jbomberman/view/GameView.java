@@ -615,11 +615,12 @@ public class GameView implements Observer {
     }
 
     private void runOpeningDoorAnimation(){
-        runAnimation(exit, 1,14, "doors");
+        runAnimation(exit, 1,14, "doors", false);
     }
 
     private void runBlockDestructionAnimation(ImageView imageView){
-        runAnimation(imageView, 1, 6, "random_blocks");
+        gameBoard.getChildren().add(imageView);
+        runAnimation(imageView, 1, 6, "random_blocks", true);
     }
 
     /**
@@ -629,11 +630,14 @@ public class GameView implements Observer {
      * @param end when the animation ends
      * @param path the path of the image
      */
-    private void runAnimation(ImageView imageView, int index, int end, String path) {
+    private void runAnimation(ImageView imageView, int index, int end, String path, boolean remove) {
         imageView.setImage(new Image(Objects.requireNonNull(GameView.class.getResourceAsStream( path + "/" + index + ".png"))));
         PauseTransition pauseTransition = new PauseTransition(Duration.millis(160));
         pauseTransition.setOnFinished(event -> {
-            if (index < end) runAnimation(imageView, index + 1, end, path);
+            if (index < end) runAnimation(imageView, index + 1, end, path, remove);
+            else if (remove) {
+                gameBoard.getChildren().remove(imageView);
+            }
         });
         pauseTransition.play();
     }
