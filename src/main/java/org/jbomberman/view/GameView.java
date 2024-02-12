@@ -629,6 +629,7 @@ public class GameView implements Observer {
      * @param index the index used with the path
      * @param end when the animation ends
      * @param path the path of the image
+     * @param remove tells if the imageview needs to be removed
      */
     private void runAnimation(ImageView imageView, int index, int end, String path, boolean remove) {
         imageView.setImage(new Image(Objects.requireNonNull(GameView.class.getResourceAsStream( path + "/" + index + ".png"))));
