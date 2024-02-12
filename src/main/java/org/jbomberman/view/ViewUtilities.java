@@ -15,13 +15,13 @@ import org.jbomberman.utils.Coordinate;
 /**
  * This class contains some utilities for the views
  */
-public class ViewUtilities {
+public interface ViewUtilities {
 
-    public static final int SCALE_FACTOR = 35;
-    public static final int WIDTH = SCALE_FACTOR* MainController.DX;
-    public static final int HEIGHT = SCALE_FACTOR*MainController.DY;
-    public static final Font CUSTOM_FONT_SMALL = Font.loadFont(ViewUtilities.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR-5);
-    public static final int MAX_NAME_LETTERS = 8;
+    int SCALE_FACTOR = 35;
+    int WIDTH = SCALE_FACTOR* MainController.DX;
+    int HEIGHT = SCALE_FACTOR*MainController.DY;
+    Font CUSTOM_FONT_SMALL = Font.loadFont(ViewUtilities.class.getResourceAsStream("/org/jbomberman/SfComicScriptBold-YXD2.ttf"), SCALE_FACTOR-5);
+    int MAX_NAME_LETTERS = 8;
 
 
     /**
@@ -33,7 +33,7 @@ public class ViewUtilities {
      * of the main menu)
      * @return the pane
      */
-    public static Pane createPane(String string, boolean opacity, boolean main) {
+    static Pane createPane(String string, boolean opacity, boolean main) {
         if (opacity && main) {
             System.out.println("you can't set opacity and main at the same time!!");
             return new Pane();
@@ -88,7 +88,7 @@ public class ViewUtilities {
      * @param color color of the button
      * @return
      */
-    public static Label getButton(String text, int i, Color color) {
+    static Label getButton(String text, int i, Color color) {
         Text textNode = new Text(text);
         textNode.setFont(CUSTOM_FONT_SMALL);
         textNode.setFill(color);
@@ -123,7 +123,7 @@ public class ViewUtilities {
      * @param toHide
      * @param toShow
      */
-    public static void changePane(Pane toHide, Pane toShow) {
+    static void changePane(Pane toHide, Pane toShow) {
         toHide.setVisible(false);
         toShow.setVisible(true);
         toShow.toFront();
@@ -136,7 +136,7 @@ public class ViewUtilities {
      * @param coordinate
      * @return
      */
-    public static Label getFloatingLabel(String string, Coordinate coordinate){
+    static Label getFloatingLabel(String string, Coordinate coordinate){
         Label text = new Label("+" + string);
         text.setFont(CUSTOM_FONT_SMALL);
         text.setLayoutX(((double)coordinate.x() * SCALE_FACTOR)-30);
@@ -150,7 +150,7 @@ public class ViewUtilities {
      * @param image
      * @return
      */
-    public static ImageView createImageView(Coordinate coordinate, Image image) {
+    static ImageView createImageView(Coordinate coordinate, Image image) {
         ImageView imageView = new ImageView(image);
         imageView.setLayoutX((double)coordinate.x() * SCALE_FACTOR);
         imageView.setLayoutY((double)coordinate.y() * SCALE_FACTOR);
@@ -163,7 +163,7 @@ public class ViewUtilities {
      * This method centers the given node
      * @param node the node to center
      */
-    public static void setCentred(Node node){
+    static void setCentred(Node node){
         Platform.runLater(() -> {
             double textWidth = node.getLayoutBounds().getWidth();
             double textHeight = node.getLayoutBounds().getHeight();

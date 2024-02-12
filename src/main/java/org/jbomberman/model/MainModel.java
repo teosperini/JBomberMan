@@ -424,6 +424,7 @@ public class MainModel extends Observable {
      * @param keyCode is the code of the key pressed by the player
      */
     public void movePlayer(KeyCode keyCode) {
+        //TODO usare Direction invece di KeyCode
         if (KEY_CODES.contains(keyCode)) {
         Coordinate oldPosition = playerPosition;
             Coordinate newPosition = calculateNewPosition(keyCode, playerPosition);
@@ -648,6 +649,7 @@ public class MainModel extends Observable {
         playerInvincible = true;
         setChanged();
         notifyObservers(new UpdateInfo.Builder(UpdateType.UPDATE_PU_INVINCIBLE).setPlayerInvincible(true).build());
+        //TODO
         PauseTransition pauseInvincible = new PauseTransition(Duration.seconds(10));
         pauseInvincible.setOnFinished(actionEvent -> {
             playerInvincible = false;

@@ -22,7 +22,7 @@ import static org.jbomberman.view.ViewUtilities.*;
  * The GameView is the class that creates the view of the game
  * It is the View of the MVC pattern and is the Observer in the Observer/Observable pattern
  */
-public class GameView implements Observer {
+public class GameView extends View implements Observer, ViewUtilities {
 
     private final MainController controller;
 
@@ -120,11 +120,11 @@ public class GameView implements Observer {
         coins = new ArrayList<>();
         bombExplosion = new ArrayList<>();
         addBottomBar();
-        createGamePanes();
-        initializeKeyPressed();
+        createPanes();
+        initializeView();
     }
 
-    public void initializeKeyPressed() {
+    public void initializeView() {
         // The event handler for the pressed keys
         gameBoard.setOnKeyPressed(controller::handleGameKeyEvent);
     }
@@ -140,15 +140,15 @@ public class GameView implements Observer {
      * - The gameVictory Pane
      * and all of their buttons (except for the buttons of gameVictory, those are chosen at runtime)
      */
-    private void createGamePanes() {
+    protected void createPanes() {
 
         //################# PAUSE ################//
-        pause = ViewUtilities.createPane("Pause", true, false);
+        pause = createPane("Pause", true, false);
         pause.setVisible(false);
 
-        Label pauseResumeButton = ViewUtilities.getButton("resume", 0, Color.WHITE);
-        Label pauseOptionsButton = ViewUtilities.getButton("options", 1, Color.WHITE);
-        Label pauseExitButton = ViewUtilities.getButton("menu", 2, Color.WHITE);
+        Label pauseResumeButton = getButton("resume", 0, Color.WHITE);
+        Label pauseOptionsButton = getButton("options", 1, Color.WHITE);
+        Label pauseExitButton = getButton("menu", 2, Color.WHITE);
 
         pauseResumeButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
@@ -350,7 +350,7 @@ public class GameView implements Observer {
     }
 
     //#################### PUBLIC GETTERS #####################//
-    public AnchorPane getGame() {
+    public AnchorPane getRoot() {
         return gameBoard;
     }
 

@@ -67,9 +67,8 @@ public class MainController {
         model = new MainModel(DX, DY);
 
         menuView = new MenuView();
-        menuView.initialize();
 
-        Parent root = menuView.getMenu();
+        Parent root = menuView.getRoot();
         scene = new Scene(root, ViewUtilities.WIDTH, ViewUtilities.HEIGHT);
         stage.setScene(scene);
         stage.show();
@@ -176,7 +175,7 @@ public class MainController {
             BackgroundMusic.playGameMusic();
         }
 
-        scene.setRoot(gameView.getGame());
+        scene.setRoot(gameView.getRoot());
         gameView.getFocus();
 
         pause = false;
@@ -212,7 +211,7 @@ public class MainController {
             BackgroundMusic.stopGameMusic();
         }
         model.save();
-        scene.setRoot(menuView.getMenu());
+        scene.setRoot(menuView.getRoot());
         BackgroundMusic.playMenuMusic();
 
         model.deleteObservers();

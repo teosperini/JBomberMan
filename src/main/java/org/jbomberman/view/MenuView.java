@@ -8,12 +8,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import org.jbomberman.utils.BackgroundMusic;
 
+import static org.jbomberman.view.ViewUtilities.*;
+
 /**
  * This is the class that creates the view of the menu
  * It does not implement Observer/Observable as it does not need
  * to be notified by the model
  */
-public class MenuView {
+public class MenuView extends View implements ViewUtilities{
 
     private final AnchorPane menu = new AnchorPane();
     private Pane mainMenu;
@@ -22,29 +24,33 @@ public class MenuView {
 
     private MainController controller;
 
+    public MenuView(){
+        initializeView();
+    }
+
     /**
      * Initializes the menu
      */
-    public void initialize() {
+    public void initializeView() {
         controller = MainController.getInstance();
         leader = new LeaderboardView();
         leaderboard = leader.getLeaderboardPane();
-        paneAndButtons();
+        createPanes();
     }
 
     /**
      * This method creates all the panes and the buttons in the MenuView
      */
-    private void paneAndButtons() {
+    protected void createPanes() {
         Color color = Color.WHITE;
         //################### MAIN MENU ##################//
-        mainMenu = ViewUtilities.createPane("JBomberMan", false, true);
+        mainMenu = createPane("JBomberMan", false, true);
         mainMenu.setVisible(true);
 
-        Label mainMenuPlayButton = ViewUtilities.getButton("play", 0, color);
+        Label mainMenuPlayButton = getButton("play", 0, color);
 
-        Label mainMenuLeaderboardButton = ViewUtilities.getButton("leaderboard", 1, color);
-        Label mainMenuExitButton = ViewUtilities.getButton("quit", 2, color);
+        Label mainMenuLeaderboardButton = getButton("leaderboard", 1, color);
+        Label mainMenuExitButton = getButton("quit", 2, color);
 
         mainMenuPlayButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
@@ -68,11 +74,11 @@ public class MenuView {
 
         leaderboard.setVisible(false);
 
-        Label leaderboardBackButton = ViewUtilities.getButton("back", 4, Color.WHITE);
+        Label leaderboardBackButton = getButton("back", 4, Color.WHITE);
 
         leaderboardBackButton.setOnMouseClicked(mouseEvent -> {
             BackgroundMusic.playClick();
-            ViewUtilities.changePane(leaderboard, mainMenu);
+            changePane(leaderboard, mainMenu);
         });
 
         leaderboard.getChildren().add(leaderboardBackButton);
@@ -84,7 +90,7 @@ public class MenuView {
      * Returns the menu
      * @return
      */
-    public AnchorPane getMenu() {
+    public AnchorPane getRoot() {
         return menu;
     }
 }
